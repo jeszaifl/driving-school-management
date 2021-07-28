@@ -1,0 +1,17 @@
+.MuiPaper-root > div {
+  margin: 0 !important;
+}
+
+.MuiTableCell-root > div {
+  font-size: 1.75rem !important;
+}
+
+.MuiButton-label {
+  font-size: 1.875rem !important;
+}
+
+#deleteButton {
+  background-color: #d9534f;
+  border-color: #d43f3a;
+  margin-right: 1.43rem;
+}
