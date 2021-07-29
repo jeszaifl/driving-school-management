@@ -6,6 +6,10 @@ const APIError = require('../../helpers/APIError');
  * Appointments Schema
  */
 const AppointmentsSchema = new mongoose.Schema({
+  googleCalendarId: {
+    type: String,
+    required: true
+  },
   title: {
     type: String,
     required: true
@@ -14,57 +18,57 @@ const AppointmentsSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  startTime: { 
+  startTime: {
     type: String,
     required: true
   },
-  puTime: { 
+  puTime: {
     type: String,
     required: true
   },
-  endTime: { 
+  endTime: {
     type: String,
     required: true
   },
-  doTime: { 
+  doTime: {
     type: String,
     required: true
   },
-  driver: { 
+  driver: {
     type: String,
     required: true
   },
-  type: { 
+  type: {
     type: String,
     required: true
   },
-  puLocation: { 
+  puLocation: {
     type: String,
     required: true
   },
-  instructor: { 
+  instructor: {
     type: String,
     required: true
   },
-  vehicle: { 
+  vehicle: {
     type: String,
     required: true
   },
-  status: { 
+  status: {
     type: String,
     required: true
   },
-  instrunctionOne:{
+  instrunctionOne: {
     type: String,
     required: true
   },
-  instructionTwo: { 
+  instructionTwo: {
     type: String,
     required: true
   },
-  notes: { 
+  notes: {
     type: String,
-    required:true
+    required: true
   },
   createdAt: {
     type: Date,

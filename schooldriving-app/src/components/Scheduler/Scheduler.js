@@ -24,10 +24,11 @@ import AppointmentFormComponent from '../AppointmentForm/AppointmentForm'
 
 import './scheduler.styles.css'
 import { formatDateYYYYMMDD, IsObjEmpty } from '../../utility/ToolFct';
-import AppointmentDM from '../../dataModel/AppointmentDM';
+import AppointmentDM from '../../utility/dataModel/AppointmentDM';
 
 export default function SchedulerTable(props) {
   const [hasDeleteBtn, setHasDeleteBtn] = useState(false);
+  const [isAppointmentFormVisble, setIsAppointmentFormVisble] = useState(false);
 
   const { schedulerData } = props
   const form = useRef();
@@ -35,12 +36,13 @@ export default function SchedulerTable(props) {
   useEffect(() => { }, [])
 
   const AppointmentFormLayout = (data) => {
-    const date = data.appointmentData.startDate
+    const { appointmentData } = data
+    const date = appointmentData.startDate
     const selectedDate = formatDateYYYYMMDD(date)
 
     let formData = new AppointmentDM()
-    if (!IsObjEmpty(data.appointmentData.apiData)) {
-      formData = data.appointmentData.apiData
+    if (!IsObjEmpty(appointmentData.apiData)) {
+      formData = appointmentData.apiData
       setHasDeleteBtn(true)
     } else {
       setHasDeleteBtn(false)
@@ -53,6 +55,7 @@ export default function SchedulerTable(props) {
             ref={form}
             selectedDate={selectedDate}
             formData={formData}
+            isVisbleFunction={(e) => { setIsAppointmentFormVisble(false) }}
           />
         </div>
       </Fragment>
@@ -98,32 +101,36 @@ export default function SchedulerTable(props) {
   );
 
   return (
-    <Paper>
-      <Scheduler
-        data={schedulerData}
-      >
-        <ViewState />
-        <MonthView />
-        <DayView
-          startDayHour={9}
-          endDayHour={14}
-        />
-        <Appointments appointmentComponent={Appointment} />
-        <AppointmentTooltip
-          // headerComponent={Header}
-          // contentComponent={AppointmentForm}
-          // commandButtonComponent={CommandButton}
-          showCloseButton
-        />
-        <AppointmentForm
-          basicLayoutComponent={AppointmentFormLayout}
-          commandLayoutComponent={CommandButton}
-        />
-        <Toolbar />
-        <DateNavigator />
-        <ViewSwitcher />
-      </Scheduler>
-    </Paper>
+    <div>
+      <Paper>
+        <Scheduler
+          data={schedulerData}
+        >
+          <ViewState />
+          <MonthView />
+          <DayView
+            startDayHour={0}
+            endDayHour={24}
+          />
+          <Appointments appointmentComponent={Appointment} />
+          <AppointmentTooltip
+            // headerComponent={Header}
+            // contentComponent={AppointmentForm}
+            // commandButtonComponent={CommandButton}
+            showCloseButton
+          />
+          <AppointmentForm
+            visible={isAppointmentFormVisble}
+            onVisibilityChange={(e) => { setIsAppointmentFormVisble(e) }}
+            basicLayoutComponent={AppointmentFormLayout}
+            commandLayoutComponent={CommandButton}
+          />
+          <Toolbar />
+          <DateNavigator />
+          <ViewSwitcher />
+        </Scheduler>
+      </Paper>
+    </div>
   )
 }
 

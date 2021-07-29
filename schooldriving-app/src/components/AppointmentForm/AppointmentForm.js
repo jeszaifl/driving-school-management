@@ -3,21 +3,23 @@ import React, {
   useEffect,
   useRef,
   useImperativeHandle,
-  forwardRef
+  forwardRef,
+  useContext
 } from 'react'
 
 import PropTypes from 'prop-types';
-
 import ApiCalendar from 'react-google-calendar-api';
 
 import config from '../../utility/api';
-
-import AppointmentDM from '../../dataModel/AppointmentDM';
+import AppointmentDM from '../../utility/dataModel/AppointmentDM';
 import { addDays, IsEmpty, removeKeyFromObject } from '../../utility/ToolFct';
+
+import { CalendarContext } from '../../context/CalendarContext';
 
 function AppointmentForm(props, ref) {
   const [fields, setFields] = useState();
-  const { selectedDate, formData } = props
+  const { selectedDate, formData, isVisbleFunction } = props
+  const { getAllEvents } = useContext(CalendarContext)
 
   useEffect(() => {
     setFields({
@@ -28,43 +30,134 @@ function AppointmentForm(props, ref) {
 
   useImperativeHandle((ref), () => ({
     upsertFromParents(res) {
-      res === 'edit' ? submitForm() : deleteForm()
+      if (ApiCalendar.sign) {
+        res === 'edit' ? submitForm() : deleteForm()
+      } else {
+        ApiCalendar.handleAuthClick()
+      }
     }
   }))
 
   const deleteForm = () => {
-    if (!IsEmpty(fields._id)) {
+    const { _id, googleCalendarId } = fields
+
+    if (!IsEmpty(_id) && !IsEmpty(googleCalendarId)) {
       const requestOptions = {
         method: 'DELETE',
         redirect: 'follow'
       };
 
-      fetch(`${config.api}appointments/${fields._id}`, requestOptions)
-        .then((response) => response.text())
-        .then((result) => {
-          ApiCalendar.deleteEvent('2eo85lmjkkd2i63uo3lhi8a2cq').then(console.log);
-        })
-        .catch((error) => console.log('error', error));
+      ApiCalendar
+        .deleteEvent(googleCalendarId)
+        .then((res) => {
+          alert('Delete from Google calendar')
+
+          fetch(`${config.api}appointments/${_id}`, requestOptions)
+            .then((response) => response.text())
+            .then((result) => {
+              alert('Delete from Api')
+              getAllEvents()
+              isVisbleFunction()
+            })
+            .catch((error) => console.log('error', error));
+        });
     }
   }
 
   const submitForm = () => {
-    let method = 'POST'
-    let url = `${config.api}appointments/`;
-    const myHeaders = new Headers();
+    const {
+      _id,
+      title,
+      date,
+      startTime,
+      puTime,
+      endTime,
+      doTime,
+      driver,
+      type,
+      puLocation,
+      instructor,
+      vehicle,
+      status,
+      instrunctionOne,
+      instructionTwo,
+      notes,
+    } = fields
 
-    if (!IsEmpty(fields._id)) {
-      method = 'PUT'
-      url = `${config.api}appointments/${fields._id}`
+    if (
+      !IsEmpty(title)
+      && !IsEmpty(date)
+      && !IsEmpty(startTime)
+      && !IsEmpty(puTime)
+      && !IsEmpty(endTime)
+      && !IsEmpty(doTime)
+      && !IsEmpty(driver)
+      && !IsEmpty(type)
+      && !IsEmpty(puLocation)
+      && !IsEmpty(instructor)
+      && !IsEmpty(vehicle)
+      && !IsEmpty(status)
+      && !IsEmpty(instrunctionOne)
+      && !IsEmpty(instructionTwo)
+      && !IsEmpty(notes)
+    ) {
+      let method = 'POST'
+      let url = `${config.api}appointments/`;
+
+      if (!IsEmpty(_id)) {
+        method = 'PUT'
+        url = `${config.api}appointments/${_id}`
+      }
+
+      const appointMentModel = new AppointmentDM()
+      appointMentModel.readFromObj(fields)
+      removeKeyFromObject(appointMentModel, ['_id', 'createdAt'])
+
+      const startDateTime = new Date(`${appointMentModel.date} ${appointMentModel.startTime}`).toISOString();
+      const endDateTime = new Date(`${appointMentModel.date} ${appointMentModel.endTime}`).toISOString();
+
+      const eventToGoogle = {
+        summary: appointMentModel.title,
+        start: {
+          dateTime: new Date(startDateTime).toISOString(),
+        },
+        end: {
+          dateTime: new Date(endDateTime).toISOString()
+        }
+      };
+
+      if (method === 'POST') {
+        ApiCalendar.createEvent(eventToGoogle)
+          .then((googleRes) => {
+            const { result } = googleRes
+            const raw = JSON.stringify({
+              ...appointMentModel,
+              googleCalendarId: result.id
+            });
+            upsertForm(url, raw, method)
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+      } else {
+        ApiCalendar.updateEvent(eventToGoogle, appointMentModel.googleCalendarId)
+          .then((googleRes) => {
+            console.log(googleRes)
+            alert('Update Data to Google calendar')
+            const raw = JSON.stringify({
+              ...appointMentModel
+            });
+            upsertForm(url, raw, method)
+          });
+      }
+    } else {
+      alert('Please fill up the form.')
     }
-    myHeaders.append('Content-Type', 'application/json');
+  }
 
-    const appointMentModel = new AppointmentDM()
-    appointMentModel.readFromObj(fields)
-    removeKeyFromObject(appointMentModel, ['_id', 'createdAt'])
-    const raw = JSON.stringify({
-      ...appointMentModel
-    });
+  const upsertForm = (url, raw, method) => {
+    const myHeaders = new Headers();
+    myHeaders.append('Content-Type', 'application/json');
 
     const requestOptions = {
       method,
@@ -75,31 +168,10 @@ function AppointmentForm(props, ref) {
 
     fetch(url, requestOptions)
       .then((response) => response.text())
-      .then((result) => {
-        const eventToGoogle = {
-          apiData: result,
-          summary: appointMentModel.title,
-          start: {
-            dateTime: new Date(appointMentModel.date).toISOString(),
-          },
-          end: {
-            dateTime: addDays(new Date(appointMentModel.date), 0.5).toISOString()
-          }
-        };
-
-        ApiCalendar.createEvent(eventToGoogle)
-          .then((googleRes) => {
-            if (method === 'POST') {
-              alert('Save Data to Google calendar')
-            } else {
-              alert('Update Data to Google calendar')
-            }
-            console.log(googleRes)
-            // window.location.reload()
-          })
-          .catch((error) => {
-            console.log(error);
-          });
+      .then((res) => {
+        // window.location.reload()
+        getAllEvents()
+        isVisbleFunction()
       })
       .catch((error) => console.log('error', error));
   }
@@ -313,12 +385,14 @@ function AppointmentForm(props, ref) {
 
 AppointmentForm.defaultProps = {
   selectedDate: '',
-  formData: {}
+  formData: {},
+  isVisbleFunction: ''
 }
 
 AppointmentForm.propTypes = {
   selectedDate: PropTypes.string,
   formData: PropTypes.objectOf(PropTypes.string),
+  isVisbleFunction: PropTypes.func
 };
 
 export default forwardRef(AppointmentForm)

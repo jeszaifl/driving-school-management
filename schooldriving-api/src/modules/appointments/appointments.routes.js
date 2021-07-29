@@ -8,6 +8,7 @@ const router = express.Router();
 const paramValidation = {
   createAppointments: {
     body: Joi.object({
+      googleCalendarId: Joi.string().required(),
       title: Joi.string().required(),
       date: Joi.string().required(),
       startTime: Joi.string().required(),
@@ -30,6 +31,7 @@ const paramValidation = {
       appointmentsId: Joi.string().required(),
     }),
     body: Joi.object({
+      googleCalendarId: Joi.string().required(),
       title: Joi.string().required(),
       date: Joi.string().required(),
       startTime: Joi.string().required(),

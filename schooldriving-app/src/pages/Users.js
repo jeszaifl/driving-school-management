@@ -6,21 +6,56 @@ import React, {
 } from 'react'
 
 import Layout from '../components/Layout/Layout'
+import Modal from '../components/Modal/Modal'
 import Panel from '../components/Panel/Panel'
 import config from '../utility/api'
+import { IsEmpty } from '../utility/ToolFct'
 
 export default function Users() {
+  const [user, setUsers] = useState([])
+  const [fields, setFields] = useState();
+
   useEffect(() => {
     fetchUsers()
-  })
+  }, [])
 
   const fetchUsers = () => {
     fetch(`${config.api}users`)
       .then((response) => response.json())
       .then((result) => {
-        console.log(result)
+        setUsers(result)
       })
       .catch((error) => console.log('error', error));
+  }
+
+  const upsertUser = () => {
+    const myHeaders = new Headers();
+    myHeaders.append('Content-Type', 'application/json');
+
+    const raw = JSON.stringify(fields);
+
+    const requestOptions = {
+      method: 'POST',
+      headers: myHeaders,
+      body: raw,
+      redirect: 'follow'
+    };
+
+    fetch(`${config.api}users/register`, requestOptions)
+      .then((response) => response.text())
+      .then((result) => {
+        setFields([])
+        fetchUsers()
+      })
+      .catch((error) => console.log('error', error));
+  }
+
+  const handleChange = (e) => {
+    const { name, value } = e.target
+    setFields({
+      ...fields,
+      [name]: value
+    })
   }
 
   return (
@@ -33,72 +68,92 @@ export default function Users() {
         </div>
       </div>
       <div className="container">
-        <Panel>
+        <Modal buttonText="Add User">
           <div className="row">
             <div className="six columns">
-              <label htmlFor="exampleEmailInput">First Name</label>
-              <input className="u-full-width" type="email" placeholder="First Name" id="exampleEmailInput" />
+              <label>First Name</label>
+              <input
+                className="u-full-width"
+                type="text"
+                name="firstName"
+                onChange={(e) => handleChange(e)}
+              />
             </div>
             <div className="six columns">
-              <label htmlFor="exampleEmailInput">Last Name</label>
-              <input className="u-full-width" type="email" placeholder="Last Name" id="exampleEmailInput" />
+              <label>Last Name</label>
+              <input
+                className="u-full-width"
+                type="text"
+                name="lastName"
+                onChange={(e) => handleChange(e)}
+              />
             </div>
             <div className="row">
               <div className="six columns">
-                <label htmlFor="exampleEmailInput">Email</label>
-                <input className="u-full-width" type="email" placeholder="Your email" id="exampleEmailInput" />
+                <label>Email</label>
+                <input
+                  className="u-full-width"
+                  type="text"
+                  name="email"
+                  onChange={(e) => handleChange(e)}
+                />
               </div>
               <div className="six columns">
-                <label htmlFor="exampleEmailInput">Password</label>
-                <input className="u-full-width" type="password" placeholder="Your password" id="exampleEmailInput" />
+                <label>Type</label>
+                <input
+                  className="u-full-width"
+                  type="text"
+                  name="type"
+                  onChange={(e) => handleChange(e)}
+                />
               </div>
             </div>
-            <input className="button-primary" type="submit" value="Add User" />
+            <div className="row">
+              <div className="six columns">
+                <label>Username</label>
+                <input
+                  className="u-full-width"
+                  type="text"
+                  name="username"
+                  onChange={(e) => handleChange(e)}
+                />
+              </div>
+              <div className="six columns">
+                <label>Password</label>
+                <input
+                  className="u-full-width"
+                  type="password"
+                  name="password"
+                  onChange={(e) => handleChange(e)}
+                />
+              </div>
+            </div>
+            <input
+              className="button-primary"
+              type="button"
+              value="Add User"
+              onClick={(e) => upsertUser()}
+            />
           </div>
-        </Panel>
+        </Modal>
       </div>
       <div className="container">
-        <Panel>
-          <div className="grid">
-            <div
-              className="card"
-            >
-              <h3>User</h3>
-              <p>Driver</p>
-            </div>
-
-            <div
-              className="card"
-            >
-              <h3>Calendar</h3>
-              <p>Find in-depth information client schedules.</p>
-            </div>
-            <div
-              className="card"
-            >
-              <h3>User</h3>
-              <p>Driver</p>
-            </div>
-            <div
-              className="card"
-            >
-              <h3>User</h3>
-              <p>Driver</p>
-            </div>
-            <div
-              className="card"
-            >
-              <h3>User</h3>
-              <p>Driver</p>
-            </div>
-            <div
-              className="card"
-            >
-              <h3>User</h3>
-              <p>Driver</p>
-            </div>
-          </div>
-        </Panel>
+        {
+          !IsEmpty(user)
+          && user.map((val, key) => {
+            return (
+              <div className="three columns">
+                <Panel>
+                  <h5>
+                    {val.firstName}
+                    {' '}
+                    {key.lastName}
+                  </h5>
+                </Panel>
+              </div>
+            )
+          })
+        }
       </div>
     </Layout>
 

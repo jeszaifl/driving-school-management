@@ -49,6 +49,7 @@ async function create(req, res, next) {
  */
 async function update(req, res, next) {
   const { appointments } = req;
+  appointments.googleCalendarId = req.body.googleCalendarId || appointments.googleCalendarId;
   appointments.title = req.body.title || appointments.title;
   appointments.date = req.body.date || appointments.date;
   appointments.startTime = req.body.startTime || appointments.startTime;

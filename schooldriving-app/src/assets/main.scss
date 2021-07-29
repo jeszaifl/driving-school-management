@@ -133,6 +133,26 @@ code {
   height: 1em;
 }
 
+.form {
+  background-color: #f2f2f2;
+  padding: 40px;
+  margin-top: 10%;
+  max-width: 350px;
+  margin-right: auto;
+  margin-left: auto;
+}
+
+.form h4 {
+  text-align: center;
+  font-weight: 900;
+}
+
+.loginBtn {
+  width: 100%;
+}
+.forgotPassword {
+  text-align: right;
+}
 @media (max-width: 600px) {
   .grid {
     width: 100%;
@@ -140,8 +160,6 @@ code {
   }
 }
 
-
-
-.main-container { 
+.main-container {
   margin-left: 200px;
- }
+}

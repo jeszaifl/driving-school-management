@@ -6,14 +6,30 @@ const { validate } = require('../../helpers');
 const router = express.Router();
 
 const paramValidation = {
+  loginUser: {
+    body: Joi.object({
+      email: Joi.string().required(),
+      password: Joi.string().required(),
+    }),
+  },
   updateUser: {
     body: Joi.object({
       email: Joi.string().required(),
       firstName: Joi.string(),
       lastName: Joi.string(),
+      type: Joi.string(),
     }),
     params: Joi.object({
       userId: Joi.string().hex().required(),
+    }),
+  },
+  registerUser: {
+    body: Joi.object({
+      password: Joi.string().required(),
+      email: Joi.string().required(),
+      firstName: Joi.string().required(),
+      lastName: Joi.string().required(),
+      type: Joi.string().required(),
     }),
   },
 };
@@ -22,9 +38,17 @@ router.route('/')
   /** GET /api/users - Get list of users */
   .get(userCtrl.list);
 
+router.route('/login')
+  /** GET /api/users - Get list of users */
+  .post(validate(paramValidation.loginUser), userCtrl.login);
+
 router.route('/profile')
   /** GET /api/users/profile - Get profile of logged in user */
   .get(userCtrl.getProfile);
+
+router.route('/register')
+  /** POST /api/retister - Register user */
+  .post(validate(paramValidation.registerUser), userCtrl.register)
 
 router.route('/:userId')
   /** GET /api/users/:userId - Get user */
