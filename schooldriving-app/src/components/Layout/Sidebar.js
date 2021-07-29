@@ -1,10 +1,24 @@
-import * as React from 'react';
+import React, { useEffect, useState, Fragment } from 'react';
 import PropTypes from 'prop-types';
 import './sidebar.style.scss'
 import { Link } from 'react-router-dom';
-import { Fragment } from 'react';
+import ApiCalendar from 'react-google-calendar-api';
+import { IsEmpty } from '../../utility/ToolFct';
 
 export default function Sidebar(props) {
+  const [userInfo, setUserInfo] = useState({ userName: '', userImg: '' })
+
+  useEffect(() => {
+    ApiCalendar.onLoad(() => {
+      const response = ApiCalendar.getBasicUserProfile()
+      console.log(response.getImageUrl())
+      setUserInfo({
+        userName: response.getName(),
+        userImg: response.getImageUrl(),
+      })
+    });
+  }, [])
+
   return (
     // <div id="mySidenav" className="sidenav">
     //   {/* <a href="/">Home</a> */}
@@ -241,51 +255,16 @@ export default function Sidebar(props) {
                 <div className="dropdown dib">
                   <div className="header-icon" data-toggle="dropdown">
                     <span className="user-avatar">
-                      John
+                      <img
+                        alt="profile"
+                        src={`${!IsEmpty(userInfo) && userInfo.userImg}`}
+                        style={{ width: 30, height: 30, borderRadius: 30 }}
+                      />
+                      {' '}
+                      {!IsEmpty(userInfo) && userInfo.userName}
                       <i className="ti-angle-down f-s-10" />
                     </span>
-                    <div className="drop-down dropdown-profile dropdown-menu dropdown-menu-right">
-                      <div className="dropdown-content-heading">
-                        <span className="text-left">Upgrade Now</span>
-                        <p className="trial-day">30 Days Trail</p>
-                      </div>
-                      <div className="dropdown-content-body">
-                        <ul>
-                          <li>
-                            <a href="/">
-                              <i className="ti-user" />
-                              <span>Profile</span>
-                            </a>
-                          </li>
 
-                          <li>
-                            <a href="/">
-                              <i className="ti-email" />
-                              <span>Inbox</span>
-                            </a>
-                          </li>
-                          <li>
-                            <a href="/">
-                              <i className="ti-settings" />
-                              <span>Setting</span>
-                            </a>
-                          </li>
-
-                          <li>
-                            <a href="/">
-                              <i className="ti-lock" />
-                              <span>Lock Screen</span>
-                            </a>
-                          </li>
-                          <li>
-                            <a href="/">
-                              <i className="ti-power-off" />
-                              <span>Logout</span>
-                            </a>
-                          </li>
-                        </ul>
-                      </div>
-                    </div>
                   </div>
                 </div>
               </div>
