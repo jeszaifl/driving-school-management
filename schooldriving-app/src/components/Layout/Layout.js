@@ -11,8 +11,14 @@ export default function Layout(props) {
   return (
     <Fragment>
       <Sidebar />
-      <div className="main-container">
-        {children}
+      <div className="content-wrap">
+        <div className="main">
+          <div className="container-fluid">
+            <div className="row">
+              {children}
+            </div>
+          </div>
+        </div>
       </div>
     </Fragment>
   )

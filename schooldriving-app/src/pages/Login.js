@@ -47,54 +47,63 @@ export default function Login(props) {
   }
 
   return (
-    <div className="container">
-
-      <div className="form">
-        <div className="row">
-          <div className="twelve column">
-            <h4>Login</h4>
-          </div>
-          <div className="row">
-            <div className="twelve columns">
-              <label htmlFor="exampleEmailInput"> </label>
-              <input
-                className="u-full-width"
-                placeholder="Username / email"
-                type="email"
-                name="email"
-                onChange={(e) => handleChange(e)}
-              />
-            </div>
-            <div className="twelve columns">
-              <label htmlFor="exampleEmailInput"> </label>
-              <input
-                className="u-full-width"
-                placeholder="Password"
-                type="password"
-                name="password"
-                onChange={(e) => handleChange(e)}
-              />
+    <div className="authincation h-100">
+      <div className="container-fluid h-100">
+        <div className="row justify-content-center h-100 align-items-center">
+          <div className="col-md-6">
+            <div className="authincation-content">
+              <div className="row no-gutters">
+                <div className="col-xl-12">
+                  <div className="auth-form">
+                    <h4 className="text-center mb-4">Sign in your account</h4>
+                    <form action="index.html">
+                      <div className="form-group">
+                        <label><strong>Email</strong></label>
+                        <input
+                          disabled
+                          type="email"
+                          className="form-control"
+                          value="hello@example.com"
+                        />
+                      </div>
+                      <div className="form-group">
+                        <label><strong>Password</strong></label>
+                        <input disabled type="password" className="form-control" value="Password" />
+                      </div>
+                      <div className="form-row d-flex justify-content-between mt-4 mb-2">
+                        <div className="form-group">
+                          <div className="form-check ml-2">
+                            <input className="form-check-input" type="checkbox" id="basic_checkbox_1" />
+                            <label className="form-check-label">
+                              Remember me
+                            </label>
+                          </div>
+                        </div>
+                        <div className="form-group">
+                          <a href="page-forgot-password.html">Forgot Password?</a>
+                        </div>
+                      </div>
+                      <div className="text-center">
+                        <Link
+                          to="/calendar"
+                          className="btn btn-primary btn-block"
+                        >
+                          Sign me in
+                        </Link>
+                      </div>
+                    </form>
+                    <div className="new-account mt-3">
+                      <p>
+                        Dont have an account?
+                        <a className="text-primary" href="./page-register.html">Sign up</a>
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
-        <div className="row">
-          <div className="six columns">
-            <input type="checkbox" />
-            <span className="label-body">Remember Me</span>
-          </div>
-        </div>
-        <input
-          className="button-primary loginBtn"
-          type="button"
-          value="Login"
-          onClick={(e) => { loginUser() }}
-        />
-        <Link
-          className="button-primary loginBtn"
-          to="/calendar"
-        >
-          Login as anonymous
-        </Link>
       </div>
     </div>
   )

@@ -1,6 +1,10 @@
 import React, { useState, useContext, Fragment } from 'react';
 import { BrowserRouter as Router, Route } from 'react-router-dom';
 
+import './assets/lib/bootstrap.min.css';
+import './assets/lib/sidebar.css';
+import './assets/lib/style.css';
+
 import './assets/main.scss';
 import './assets/skeleton.css';
 
