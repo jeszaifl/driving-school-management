@@ -17,7 +17,8 @@ import {
   ViewSwitcher,
   Toolbar,
   DateNavigator,
-  AppointmentForm
+  AppointmentForm,
+  WeekView
   // ConfirmationDialog,
 } from '@devexpress/dx-react-scheduler-material-ui';
 import AppointmentFormComponent from '../AppointmentForm/AppointmentForm'
@@ -69,7 +70,8 @@ export default function SchedulerTable(props) {
           width: '100%',
           background: '#fff',
           textAlign: 'right',
-          padding: 15
+          padding: 15,
+          height: 30,
         }}
         >
           {hasDeleteBtn && <input id="deleteButton" className="button-primary" type="button" value="Delete" onClick={(e) => upsertButton('delete')} />}
@@ -86,19 +88,29 @@ export default function SchedulerTable(props) {
   const Appointment = ({
     // eslint-disable-next-line react/prop-types
     children, style, ...restProps
-  }) => (
-    <Appointments.Appointment
-      {...restProps}
-      style={{
-        ...style,
-        backgroundColor: '#FFC107',
-        borderRadius: '8px',
-        fontSize: 18
-      }}
-    >
-      {children}
-    </Appointments.Appointment>
-  );
+  }) => {
+    const { data } = restProps
+
+    return (
+      <Appointments.Appointment
+        {...restProps}
+        style={{
+          ...style,
+          backgroundColor: '#FFC107',
+          borderRadius: '8px',
+          fontSize: 14,
+          padding: 10,
+        }}
+      >
+        <p style={{ color: '#fff' }}>
+          <b>{data.apiData.startTime}</b>
+          {' '}
+          {data.apiData.title}
+        </p>
+        {/* {children} */}
+      </Appointments.Appointment>
+    )
+  };
 
   return (
     <div>
@@ -108,6 +120,7 @@ export default function SchedulerTable(props) {
         >
           <ViewState />
           <MonthView />
+          <WeekView />
           <DayView
             startDayHour={0}
             endDayHour={24}
@@ -117,7 +130,8 @@ export default function SchedulerTable(props) {
             // headerComponent={Header}
             // contentComponent={AppointmentForm}
             // commandButtonComponent={CommandButton}
-            showCloseButton
+            showOpenButton
+            showDeleteButton
           />
           <AppointmentForm
             visible={isAppointmentFormVisble}

@@ -11,6 +11,7 @@ import Layout from '../components/Layout/Layout';
 import config from '../utility/api';
 
 import { CalendarContext } from '../context/CalendarContext';
+import { IsArrayEmpty } from '../utility/ToolFct';
 
 export default function Calendar() {
   // Context
@@ -25,15 +26,47 @@ export default function Calendar() {
       <Layout>
         <div className="container-fluid">
           <div className="row">
-            <div className="twelve columns">
-              <h3>Calendar</h3>
+            <div className="col-lg-3">
+              <div className="card">
+                <div className="card-title pr">
+                  <h4>All Appointments</h4>
+
+                </div>
+                <div className="card-body">
+                  <div className="table-responsive">
+                    <table className="table student-data-table m-t-20">
+                      <thead>
+                        <tr>
+                          <th>Title</th>
+                          <th>Date</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {
+                          !IsArrayEmpty(calendarEvents)
+                          && calendarEvents.map((val) => {
+                            return (
+                              <tr>
+                                <td>{val.apiData.title}</td>
+                                <td>{val.apiData.date}</td>
+                              </tr>
+                            )
+                          })
+                        }
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
             </div>
-          </div>
-          <div className="row">
-            <div className="twelve columns">
-              <SchedulerTable
-                schedulerData={calendarEvents}
-              />
+            <div className="col-lg-9">
+              <div className="card">
+                <div className="card-body">
+                  <SchedulerTable
+                    schedulerData={calendarEvents}
+                  />
+                </div>
+              </div>
             </div>
           </div>
         </div>

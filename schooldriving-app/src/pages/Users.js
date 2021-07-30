@@ -62,100 +62,98 @@ export default function Users() {
     <Layout>
       <div className="container-fluid">
         <div className="row">
-          <div className="twelve columns">
-            <h1>Users</h1>
+          <div className="col-lg-12">
+            <Modal buttonText="Add User">
+              <div className="row">
+                <div className="col-lg-6">
+                  <label>First Name</label>
+                  <input
+                    className="u-full-width"
+                    type="text"
+                    name="firstName"
+                    onChange={(e) => handleChange(e)}
+                  />
+                </div>
+                <div className="col-lg-6">
+                  <label>Last Name</label>
+                  <input
+                    className="u-full-width"
+                    type="text"
+                    name="lastName"
+                    onChange={(e) => handleChange(e)}
+                  />
+                </div>
+                <div className="col-lg-6">
+                  <label>Email</label>
+                  <input
+                    className="u-full-width"
+                    type="text"
+                    name="email"
+                    onChange={(e) => handleChange(e)}
+                  />
+                </div>
+                <div className="col-lg-6">
+                  <label>Type</label>
+                  <input
+                    className="u-full-width"
+                    type="text"
+                    name="type"
+                    onChange={(e) => handleChange(e)}
+                  />
+                </div>
+                <div className="col-lg-6">
+                  <label>Username</label>
+                  <input
+                    className="u-full-width"
+                    type="text"
+                    name="username"
+                    onChange={(e) => handleChange(e)}
+                  />
+                </div>
+                <div className="col-lg-6">
+                  <label>Password</label>
+                  <input
+                    className="u-full-width"
+                    type="password"
+                    name="password"
+                    onChange={(e) => handleChange(e)}
+                  />
+                </div>
+                <input
+                  className="button-primary"
+                  type="button"
+                  value="Add User"
+                  onClick={(e) => upsertUser()}
+                />
+              </div>
+            </Modal>
           </div>
         </div>
       </div>
-      <div className="container">
-        <Modal buttonText="Add User">
-          <div className="row">
-            <div className="six columns">
-              <label>First Name</label>
-              <input
-                className="u-full-width"
-                type="text"
-                name="firstName"
-                onChange={(e) => handleChange(e)}
-              />
-            </div>
-            <div className="six columns">
-              <label>Last Name</label>
-              <input
-                className="u-full-width"
-                type="text"
-                name="lastName"
-                onChange={(e) => handleChange(e)}
-              />
-            </div>
-            <div className="row">
-              <div className="six columns">
-                <label>Email</label>
-                <input
-                  className="u-full-width"
-                  type="text"
-                  name="email"
-                  onChange={(e) => handleChange(e)}
-                />
-              </div>
-              <div className="six columns">
-                <label>Type</label>
-                <input
-                  className="u-full-width"
-                  type="text"
-                  name="type"
-                  onChange={(e) => handleChange(e)}
-                />
-              </div>
-            </div>
-            <div className="row">
-              <div className="six columns">
-                <label>Username</label>
-                <input
-                  className="u-full-width"
-                  type="text"
-                  name="username"
-                  onChange={(e) => handleChange(e)}
-                />
-              </div>
-              <div className="six columns">
-                <label>Password</label>
-                <input
-                  className="u-full-width"
-                  type="password"
-                  name="password"
-                  onChange={(e) => handleChange(e)}
-                />
-              </div>
-            </div>
-            <input
-              className="button-primary"
-              type="button"
-              value="Add User"
-              onClick={(e) => upsertUser()}
-            />
-          </div>
-        </Modal>
-      </div>
-      <div className="container">
-        {
-          !IsEmpty(user)
-          && user.map((val, key) => {
-            return (
-              <div className="three columns">
-                <Panel>
-                  <h5>
-                    {val.firstName}
-                    {' '}
-                    {key.lastName}
-                  </h5>
-                </Panel>
-              </div>
-            )
-          })
-        }
+      <div className="container-fluid">
+        <div className="row">
+          {
+            !IsEmpty(user)
+            && user.map((val, key) => {
+              return (
+                <div className="col-lg-3">
+                  <div className="card p-0">
+                    <div className="stat-widget-three home-widget-three">
+                      <div className="stat-content" style={{ margin: 0 }}>
+                        <div className="stat-digit">
+                          {val.firstName}
+                          {val.lastName}
+                        </div>
+                        <div className="stat-text">{val.email}</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )
+            })
+          }
+        </div>
       </div>
     </Layout>
-
   )
 }

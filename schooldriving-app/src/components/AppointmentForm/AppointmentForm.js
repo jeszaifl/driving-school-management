@@ -15,11 +15,13 @@ import AppointmentDM from '../../utility/dataModel/AppointmentDM';
 import { addDays, IsEmpty, removeKeyFromObject } from '../../utility/ToolFct';
 
 import { CalendarContext } from '../../context/CalendarContext';
+import Notification from '../Notification/Notification';
 
 function AppointmentForm(props, ref) {
   const [fields, setFields] = useState();
   const { selectedDate, formData, isVisbleFunction } = props
   const { getAllEvents } = useContext(CalendarContext)
+  const notification = useRef(null);
 
   useEffect(() => {
     setFields({
@@ -50,12 +52,11 @@ function AppointmentForm(props, ref) {
       ApiCalendar
         .deleteEvent(googleCalendarId)
         .then((res) => {
-          alert('Delete from Google calendar')
-
+          notification.current.success('Delete from Google calendar')
           fetch(`${config.api}appointments/${_id}`, requestOptions)
             .then((response) => response.text())
             .then((result) => {
-              alert('Delete from Api')
+              notification.current.success('Delete from Api')
               getAllEvents()
               isVisbleFunction()
             })
@@ -143,7 +144,7 @@ function AppointmentForm(props, ref) {
         ApiCalendar.updateEvent(eventToGoogle, appointMentModel.googleCalendarId)
           .then((googleRes) => {
             console.log(googleRes)
-            alert('Update Data to Google calendar')
+            notification.current.success('Update Data to Google calendar')
             const raw = JSON.stringify({
               ...appointMentModel
             });
@@ -151,7 +152,7 @@ function AppointmentForm(props, ref) {
           });
       }
     } else {
-      alert('Please fill up the form.')
+      notification.current.error('Please fill up the form.')
     }
   }
 
@@ -178,7 +179,6 @@ function AppointmentForm(props, ref) {
 
   const handleChange = (e) => {
     const { name, value } = e.target
-
     setFields({
       ...fields,
       [name]: value
@@ -191,6 +191,7 @@ function AppointmentForm(props, ref) {
         <div className="twelve column">
           <h4>Appointment Form</h4>
         </div>
+        <Notification ref={notification} />
       </div>
 
       <div className="row">

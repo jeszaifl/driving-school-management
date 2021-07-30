@@ -39,22 +39,22 @@ export default function Sidebar(props) {
                 </a>
               </div>
               <li>
-                <a href="/" className="sidebar-sub-toggle">
+                <Link to="/calendar" className="sidebar-sub-toggle">
                   <i className="ti-home" />
                   Calendar
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="/" className="sidebar-sub-toggle">
+                <Link to="/user" className="sidebar-sub-toggle">
                   <i className="ti-home" />
                   User
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="/" className="sidebar-sub-toggle">
+                <Link to="/" className="sidebar-sub-toggle">
                   <i className="ti-home" />
                   Logout
-                </a>
+                </Link>
               </li>
             </ul>
           </div>
