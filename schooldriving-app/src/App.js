@@ -1,5 +1,5 @@
 import React, { useState, useContext, Fragment } from 'react';
-import { BrowserRouter as Router, Route } from 'react-router-dom';
+import { HashRouter as Router, Route } from 'react-router-dom';
 
 import './assets/lib/bootstrap.min.css';
 import './assets/lib/sidebar.css';
@@ -20,11 +20,11 @@ function App() {
     <AuthContextProvider>
       <Router>
         <Route exact path="/" component={Login} />
-        <Route exact path="/home" component={Home} />
+        <Route path="/home" component={Home} />
         <CalendarProvider>
-          <Route exact path="/calendar" component={Calendar} />
+          <Route path="/calendar" component={Calendar} />
         </CalendarProvider>
-        <Route exact path="/user" component={Users} />
+        <Route path="/user" component={Users} />
       </Router>
     </AuthContextProvider>
   );

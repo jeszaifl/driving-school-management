@@ -20,31 +20,32 @@ export default function Login(props) {
   }
 
   const loginUser = () => {
-    const raw = JSON.stringify(fields);
-    const myHeaders = new Headers();
-    myHeaders.append('Content-Type', 'application/json');
+    window.location.href = '/calendar'
+    // const raw = JSON.stringify(fields);
+    // const myHeaders = new Headers();
+    // myHeaders.append('Content-Type', 'application/json');
 
-    const requestOptions = {
-      method: 'POST',
-      headers: myHeaders,
-      body: raw,
-      redirect: 'follow'
-    };
+    // const requestOptions = {
+    //   method: 'POST',
+    //   headers: myHeaders,
+    //   body: raw,
+    //   redirect: 'follow'
+    // };
 
-    fetch(`${config.api}users/login`, requestOptions)
-      .then((response) => response.text())
-      .then((result) => {
-        const userData = new UserDM()
-        userData.readFromObj(JSON.parse(result))
+    // fetch(`${config.api}users/login`, requestOptions)
+    //   .then((response) => response.text())
+    //   .then((result) => {
+    //     const userData = new UserDM()
+    //     userData.readFromObj(JSON.parse(result))
 
-        if (!IsEmpty(userData._id)) {
-          alert('logged')
-          history.push('/calendar');
-        } else {
-          alert('Something went wrong')
-        }
-      })
-      .catch((error) => alert(error));
+    //     if (!IsEmpty(userData._id)) {
+    //       alert('logged')
+    //       history.push('/calendar');
+    //     } else {
+    //       alert('Something went wrong')
+    //     }
+    //   })
+    //   .catch((error) => alert(error));
   }
 
   const handleItemClick = (e, name) => {
@@ -104,13 +105,13 @@ export default function Login(props) {
           onClick={(e) => { loginUser() }}
         />
 
-        <input
+        {/* <input
           id="deleteButton"
           className="button-primary loginBtn"
           type="button"
           value="Login google"
           onClick={(e) => handleItemClick(e, 'sign-in')}
-        />
+        /> */}
         {/* <Link
           className="button-primary loginBtn"
           to="/calendar"

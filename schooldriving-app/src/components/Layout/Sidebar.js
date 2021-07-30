@@ -1,7 +1,6 @@
 import React, { useEffect, useState, Fragment } from 'react';
 import PropTypes from 'prop-types';
 import './sidebar.style.scss'
-import { Link } from 'react-router-dom';
 import ApiCalendar from 'react-google-calendar-api';
 import { IsEmpty } from '../../utility/ToolFct';
 
@@ -22,10 +21,10 @@ export default function Sidebar(props) {
   return (
     // <div id="mySidenav" className="sidenav">
     //   {/* <a href="/">Home</a> */}
-    //   <Link to="/user">User</Link>
-    //   {/* <Link to="/">Driver</Link> */}
-    //   <Link to="/calendar">Calendar</Link>
-    //   {/* <Link to="/">Contact</Link> */}
+    //   <a href="/user">User</a>
+    //   {/* <a href="/">Driver</a> */}
+    //   <a href="/calendar">Calendar</a>
+    //   {/* <a href="/">Contact</a> */}
     // </div>
     <Fragment>
       <div className="sidebar sidebar-hide-to-small sidebar-shrink sidebar-gestures">
@@ -39,22 +38,22 @@ export default function Sidebar(props) {
                 </a>
               </div>
               <li>
-                <Link to="/calendar" className="sidebar-sub-toggle">
+                <a href="/calendar" className="sidebar-sub-toggle">
                   <i className="ti-home" />
                   Calendar
-                </Link>
+                </a>
               </li>
               <li>
-                <Link to="/user" className="sidebar-sub-toggle">
+                <a href="/user" className="sidebar-sub-toggle">
                   <i className="ti-home" />
                   User
-                </Link>
+                </a>
               </li>
               <li>
-                <Link to="/" className="sidebar-sub-toggle">
+                <a href="/" className="sidebar-sub-toggle">
                   <i className="ti-home" />
                   Logout
-                </Link>
+                </a>
               </li>
             </ul>
           </div>
@@ -153,7 +152,7 @@ export default function Sidebar(props) {
                             </a>
                           </li>
                           <li className="text-center">
-                            <a href="/" className="more-link">See All</a>
+                            <a href="/" className="more-a">See All</a>
                           </li>
                         </ul>
                       </div>
@@ -245,7 +244,7 @@ export default function Sidebar(props) {
                             </a>
                           </li>
                           <li className="text-center">
-                            <a href="/" className="more-link">See All</a>
+                            <a href="/" className="more-a">See All</a>
                           </li>
                         </ul>
                       </div>
