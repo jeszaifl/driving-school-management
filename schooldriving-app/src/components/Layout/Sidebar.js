@@ -1,7 +1,9 @@
 import React, { useEffect, useState, Fragment } from 'react';
-import PropTypes from 'prop-types';
-import './sidebar.style.scss'
+import { Link } from 'react-router-dom';
 import ApiCalendar from 'react-google-calendar-api';
+import PropTypes from 'prop-types';
+
+import './sidebar.style.scss'
 import { IsEmpty } from '../../utility/ToolFct';
 
 export default function Sidebar(props) {
@@ -10,7 +12,6 @@ export default function Sidebar(props) {
   useEffect(() => {
     ApiCalendar.onLoad(() => {
       const response = ApiCalendar.getBasicUserProfile()
-      console.log(response.getImageUrl())
       setUserInfo({
         userName: response.getName(),
         userImg: response.getImageUrl(),
@@ -19,13 +20,6 @@ export default function Sidebar(props) {
   }, [])
 
   return (
-    // <div id="mySidenav" className="sidenav">
-    //   {/* <a href="/">Home</a> */}
-    //   <a href="/user">User</a>
-    //   {/* <a href="/">Driver</a> */}
-    //   <a href="/calendar">Calendar</a>
-    //   {/* <a href="/">Contact</a> */}
-    // </div>
     <Fragment>
       <div className="sidebar sidebar-hide-to-small sidebar-shrink sidebar-gestures">
         <div className="nano">
@@ -38,22 +32,22 @@ export default function Sidebar(props) {
                 </a>
               </div>
               <li>
-                <a href="/calendar" className="sidebar-sub-toggle">
+                <Link to="/calendar" className="sidebar-sub-toggle">
                   <i className="ti-home" />
                   Calendar
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="/user" className="sidebar-sub-toggle">
+                <Link to="/user" className="sidebar-sub-toggle">
                   <i className="ti-home" />
                   User
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="/" className="sidebar-sub-toggle">
+                <Link to="/" className="sidebar-sub-toggle">
                   <i className="ti-home" />
                   Logout
-                </a>
+                </Link>
               </li>
             </ul>
           </div>

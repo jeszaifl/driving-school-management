@@ -44,14 +44,18 @@ export default function Calendar() {
                       <tbody>
                         {
                           !IsArrayEmpty(calendarEvents)
-                          && calendarEvents.map((val) => {
-                            return (
+                            ? calendarEvents.map((val) => {
+                              return (
+                                <tr>
+                                  <td>{val.apiData.title}</td>
+                                  <td>{val.apiData.date}</td>
+                                </tr>
+                              )
+                            }) : (
                               <tr>
-                                <td>{val.apiData.title}</td>
-                                <td>{val.apiData.date}</td>
+                                <td className="text-center" colSpan={2}>No data available.</td>
                               </tr>
                             )
-                          })
                         }
                       </tbody>
                     </table>

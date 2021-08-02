@@ -84,15 +84,6 @@ export default function Users() {
                   />
                 </div>
                 <div className="col-lg-6">
-                  <label>Email</label>
-                  <input
-                    className="u-full-width"
-                    type="text"
-                    name="email"
-                    onChange={(e) => handleChange(e)}
-                  />
-                </div>
-                <div className="col-lg-6">
                   <label>Type</label>
                   <input
                     className="u-full-width"
@@ -101,16 +92,16 @@ export default function Users() {
                     onChange={(e) => handleChange(e)}
                   />
                 </div>
-                <div className="col-lg-6">
-                  <label>Username</label>
+                <div className="col-lg-12">
+                  <label>Email</label>
                   <input
                     className="u-full-width"
                     type="text"
-                    name="username"
+                    name="email"
                     onChange={(e) => handleChange(e)}
                   />
                 </div>
-                <div className="col-lg-6">
+                <div className="col-lg-12">
                   <label>Password</label>
                   <input
                     className="u-full-width"
@@ -142,6 +133,7 @@ export default function Users() {
                       <div className="stat-content" style={{ margin: 0 }}>
                         <div className="stat-digit">
                           {val.firstName}
+                          {' '}
                           {val.lastName}
                         </div>
                         <div className="stat-text">{val.email}</div>

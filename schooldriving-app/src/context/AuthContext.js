@@ -14,13 +14,9 @@ const AuthProvider = (props) => {
   const { children } = props
   useEffect(() => { }, []);
 
-  const setLoggedIn = () => {
-    setIsLoggedIn(!isLoggedIn)
-  }
-
   const payload = {
     isLoggedIn,
-    setLoggedIn
+    setIsLoggedIn
   };
 
   return <AuthContext.Provider value={payload}>{children}</AuthContext.Provider>;

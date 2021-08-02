@@ -44,11 +44,57 @@ function addDays(date, days) {
   return result;
 }
 
+function isValidUrl(str) {
+  const pattern = new RegExp('^(https?:\\/\\/)?((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|((\\d{1,3}\\.){3}\\d{1,3}))(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*(\\?[;&a-z\\d%_.~+=-]*)?(\\#[-a-z\\d_]*)?$', 'i')
+  return !!pattern.test(str);
+}
+
+function validateFields(form) {
+  const inputs = form.getElementsByTagName('input');
+  const selects = form.getElementsByTagName('select');
+  const textareas = form.getElementsByTagName('textarea');
+
+  const checklist = [...inputs, ...selects, ...textareas];
+  console.log(checklist)
+
+  let ret = true
+  let el = [];
+  let isValid = false;
+  const errMsg = 'Errorrrr'
+
+  for (let i = 0; i < checklist.length; i += 1) {
+    el = checklist[i]
+    isValid = el.checkValidity();
+
+    if (el.required) {
+      if (isValid) {
+        el.classList.remove('invalid-border')
+      } else {
+        el.classList.add('invalid-border')
+        ret = false
+      }
+    } else {
+      el.classList.remove('invalid-border')
+    }
+
+    // if (!isValid) {
+    //   el.classList.add('invalid-border')
+    //   ret = false
+    // } else {
+    //   el.classList.remove('invalid-border')
+    // }
+  }
+
+  return ret
+}
+
 export {
   IsEmpty,
   IsArrayEmpty,
   IsObjEmpty,
   formatDateYYYYMMDD,
   removeKeyFromObject,
-  addDays
+  isValidUrl,
+  addDays,
+  validateFields
 }

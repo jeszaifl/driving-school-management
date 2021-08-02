@@ -4,7 +4,8 @@ import React, {
   useRef,
   useImperativeHandle,
   forwardRef,
-  useContext
+  useContext,
+  createRef
 } from 'react'
 
 import PropTypes from 'prop-types';
@@ -12,7 +13,12 @@ import ApiCalendar from 'react-google-calendar-api';
 
 import config from '../../utility/api';
 import AppointmentDM from '../../utility/dataModel/AppointmentDM';
-import { addDays, IsEmpty, removeKeyFromObject } from '../../utility/ToolFct';
+import {
+  addDays,
+  IsEmpty,
+  removeKeyFromObject,
+  validateFields
+} from '../../utility/ToolFct';
 
 import { CalendarContext } from '../../context/CalendarContext';
 import Notification from '../Notification/Notification';
@@ -22,6 +28,7 @@ function AppointmentForm(props, ref) {
   const { selectedDate, formData, isVisbleFunction } = props
   const { getAllEvents } = useContext(CalendarContext)
   const notification = useRef(null);
+  const appointmentFormREF = useRef();
 
   useEffect(() => {
     setFields({
@@ -85,75 +92,65 @@ function AppointmentForm(props, ref) {
       notes,
     } = fields
 
-    if (
-      !IsEmpty(title)
-      && !IsEmpty(date)
-      && !IsEmpty(startTime)
-      && !IsEmpty(puTime)
-      && !IsEmpty(endTime)
-      && !IsEmpty(doTime)
-      && !IsEmpty(driver)
-      && !IsEmpty(type)
-      && !IsEmpty(puLocation)
-      && !IsEmpty(instructor)
-      && !IsEmpty(vehicle)
-      && !IsEmpty(status)
-      && !IsEmpty(instrunctionOne)
-      && !IsEmpty(instructionTwo)
-      && !IsEmpty(notes)
-    ) {
-      let method = 'POST'
-      let url = `${config.api}appointments/`;
-
-      if (!IsEmpty(_id)) {
-        method = 'PUT'
-        url = `${config.api}appointments/${_id}`
-      }
-
-      const appointMentModel = new AppointmentDM()
-      appointMentModel.readFromObj(fields)
-      removeKeyFromObject(appointMentModel, ['_id', 'createdAt'])
-
-      const startDateTime = new Date(`${appointMentModel.date} ${appointMentModel.startTime}`).toISOString();
-      const endDateTime = new Date(`${appointMentModel.date} ${appointMentModel.endTime}`).toISOString();
-
-      const eventToGoogle = {
-        summary: appointMentModel.title,
-        start: {
-          dateTime: new Date(startDateTime).toISOString(),
-        },
-        end: {
-          dateTime: new Date(endDateTime).toISOString()
-        }
-      };
-
-      if (method === 'POST') {
-        ApiCalendar.createEvent(eventToGoogle)
-          .then((googleRes) => {
-            const { result } = googleRes
-            const raw = JSON.stringify({
-              ...appointMentModel,
-              googleCalendarId: result.id
-            });
-            upsertForm(url, raw, method)
-          })
-          .catch((error) => {
-            console.log(error);
-          });
-      } else {
-        ApiCalendar.updateEvent(eventToGoogle, appointMentModel.googleCalendarId)
-          .then((googleRes) => {
-            console.log(googleRes)
-            notification.current.success('Update Data to Google calendar')
-            const raw = JSON.stringify({
-              ...appointMentModel
-            });
-            upsertForm(url, raw, method)
-          });
-      }
-    } else {
-      notification.current.error('Please fill up the form.')
+    const div = appointmentFormREF.current
+    console.log(div)
+    if (!validateFields(div)) {
+      return false
     }
+
+    let method = 'POST'
+    let url = `${config.api}appointments/`;
+
+    if (!IsEmpty(_id)) {
+      method = 'PUT'
+      url = `${config.api}appointments/${_id}`
+    }
+
+    const appointMentModel = new AppointmentDM()
+    appointMentModel.readFromObj(fields)
+    removeKeyFromObject(appointMentModel, ['_id', 'createdAt'])
+
+    const startDateTime = new Date(`${appointMentModel.date} ${appointMentModel.startTime}`).toISOString();
+    const endDateTime = new Date(`${appointMentModel.date} ${appointMentModel.endTime}`).toISOString();
+
+    const eventToGoogle = {
+      summary: appointMentModel.title,
+      start: {
+        dateTime: new Date(startDateTime).toISOString(),
+      },
+      end: {
+        dateTime: new Date(endDateTime).toISOString()
+      }
+    };
+
+    if (method === 'POST') {
+      ApiCalendar.createEvent(eventToGoogle)
+        .then((googleRes) => {
+          const { result } = googleRes
+          const raw = JSON.stringify({
+            ...appointMentModel,
+            googleCalendarId: result.id
+          });
+          upsertForm(url, raw, method)
+        })
+        .catch((error) => {
+          notification.current.error(error.result.error.message)
+          console.log(error);
+        });
+    } else {
+      ApiCalendar.updateEvent(eventToGoogle, appointMentModel.googleCalendarId)
+        .then((googleRes) => {
+          notification.current.success('Update Data to Google calendar')
+          const raw = JSON.stringify({
+            ...appointMentModel
+          });
+          upsertForm(url, raw, method)
+        }).catch((error) => {
+          notification.current.error(error.result.error.message)
+        });
+    }
+
+    return true
   }
 
   const upsertForm = (url, raw, method) => {
@@ -186,7 +183,9 @@ function AppointmentForm(props, ref) {
   }
 
   return (
-    <form>
+    <form
+      ref={appointmentFormREF}
+    >
       <div className="row">
         <div className="twelve column">
           <h4>Appointment Form</h4>
@@ -196,20 +195,29 @@ function AppointmentForm(props, ref) {
 
       <div className="row">
         <div className="twelve columns">
-          <label>Title</label>
+          <label>
+            Title
+            {' '}
+            <span style={{ color: 'red' }}>*</span>
+          </label>
           <input
             className="u-full-width"
             type="text"
             name="title"
             defaultValue={formData.title}
             onChange={(e) => handleChange(e)}
+            required
           />
         </div>
       </div>
 
       <div className="row">
         <div className="twelve columns">
-          <label>Date</label>
+          <label>
+            Date
+            {' '}
+            <span style={{ color: 'red' }}>*</span>
+          </label>
           <input
             className="u-full-width"
             type="date"
@@ -222,153 +230,219 @@ function AppointmentForm(props, ref) {
 
       <div className="row">
         <div className="six columns">
-          <label>Start Time</label>
+          <label>
+            Start Time
+            {' '}
+            <span style={{ color: 'red' }}>*</span>
+          </label>
           <input
             className="u-full-width"
             type="time"
             name="startTime"
             defaultValue={formData.startTime}
             onChange={(e) => handleChange(e)}
+            required
           />
         </div>
         <div className="six columns">
-          <label>PU Time</label>
+          <label>
+            PU Time
+            {' '}
+            <span style={{ color: 'red' }}>*</span>
+          </label>
           <input
             className="u-full-width"
             type="time"
             name="puTime"
+            id="teest"
             defaultValue={formData.puTime}
             onChange={(e) => handleChange(e)}
+            required
           />
         </div>
       </div>
 
       <div className="row">
         <div className="six columns">
-          <label>End Time</label>
+          <label>
+            End Time
+            {' '}
+            <span style={{ color: 'red' }}>*</span>
+          </label>
           <input
             className="u-full-width"
             type="time"
             name="endTime"
             defaultValue={formData.endTime}
             onChange={(e) => handleChange(e)}
+            required
           />
         </div>
         <div className="six columns">
-          <label>DO Time</label>
+          <label>
+            DO Time
+            {' '}
+            <span style={{ color: 'red' }}>*</span>
+          </label>
           <input
             className="u-full-width"
             type="time"
             name="doTime"
             defaultValue={formData.doTime}
             onChange={(e) => handleChange(e)}
+            required
           />
         </div>
       </div>
 
       <div className="row">
         <div className="six columns">
-          <label>Driver</label>
+          <label>
+            Driver
+            {' '}
+            <span style={{ color: 'red' }}>*</span>
+          </label>
           <input
             className="u-full-width"
             type="text"
             name="driver"
             defaultValue={formData.driver}
             onChange={(e) => handleChange(e)}
+            required
           />
         </div>
         <div className="six columns">
-          <label>Type</label>
+          <label>
+            Type
+            {' '}
+            <span style={{ color: 'red' }}>*</span>
+          </label>
           <input
             className="u-full-width"
             type="text"
             name="type"
             defaultValue={formData.type}
             onChange={(e) => handleChange(e)}
+            required
           />
         </div>
       </div>
 
       <div className="row">
         <div className="six columns">
-          <label>PU Location</label>
+          <label>
+            PU Location
+            {' '}
+            <span style={{ color: 'red' }}>*</span>
+          </label>
           <input
             className="u-full-width"
             type="text"
             name="puLocation"
             defaultValue={formData.puLocation}
             onChange={(e) => handleChange(e)}
+            required
           />
         </div>
         <div className="six columns">
-          <label>Instructor</label>
+          <label>
+            Instructor
+            {' '}
+            <span style={{ color: 'red' }}>*</span>
+          </label>
           <input
             className="u-full-width"
             type="text"
             name="instructor"
             defaultValue={formData.instructor}
             onChange={(e) => handleChange(e)}
+            required
           />
         </div>
       </div>
 
       <div className="row">
         <div className="six columns">
-          <label>Vehicle</label>
+          <label>
+            Vehicle
+            {' '}
+            <span style={{ color: 'red' }}>*</span>
+          </label>
           <input
             className="u-full-width"
             type="text"
             name="vehicle"
             defaultValue={formData.vehicle}
             onChange={(e) => handleChange(e)}
+            required
           />
         </div>
         <div className="six columns">
-          <label>Status</label>
+          <label>
+            Status
+            {' '}
+            <span style={{ color: 'red' }}>*</span>
+          </label>
           <input
             className="u-full-width"
             type="text"
             name="status"
             defaultValue={formData.status}
             onChange={(e) => handleChange(e)}
+            required
           />
         </div>
       </div>
 
       <div className="row">
         <div className="twelve columns">
-          <label>Instruction 1</label>
+          <label>
+            Instruction 1
+            {' '}
+            <span style={{ color: 'red' }}>*</span>
+          </label>
           <input
             className="u-full-width"
             type="text"
             name="instrunctionOne"
             defaultValue={formData.instrunctionOne}
             onChange={(e) => handleChange(e)}
+            required
           />
         </div>
       </div>
 
       <div className="row">
         <div className="twelve columns">
-          <label>Insruction 2</label>
+          <label>
+            Insruction 2
+            {' '}
+            <span style={{ color: 'red' }}>*</span>
+          </label>
           <input
             className="u-full-width"
             type="text"
             name="instructionTwo"
             defaultValue={formData.instructionTwo}
             onChange={(e) => handleChange(e)}
+            required
           />
         </div>
       </div>
 
       <div className="row">
         <div className="twelve columns">
-          <label>Notes</label>
+          <label>
+            Notes
+            {' '}
+            <span style={{ color: 'red' }}>*</span>
+          </label>
           <textarea
             className="u-full-width"
             name="notes"
             defaultValue={formData.notes}
             onChange={(e) => handleChange(e)}
+            required
           />
         </div>
       </div>

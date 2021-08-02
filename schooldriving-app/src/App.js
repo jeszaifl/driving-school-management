@@ -1,5 +1,15 @@
-import React, { useState, useContext, Fragment } from 'react';
-import { HashRouter as Router, Route } from 'react-router-dom';
+import React, {
+  useState,
+  useEffect,
+  useContext,
+  Fragment
+} from 'react';
+import {
+  BrowserRouter as Router,
+  Redirect,
+  Route,
+  Switch
+} from 'react-router-dom';
 
 import './assets/lib/bootstrap.min.css';
 import './assets/lib/sidebar.css';
@@ -19,6 +29,15 @@ function App() {
   return (
     <AuthContextProvider>
       <Router>
+        {/* <AuthContext.Consumer>
+          {
+            (value) => {
+              return (
+                !value.isLoggedIn && <Redirect to="/" />
+              )
+            }
+          }
+        </AuthContext.Consumer> */}
         <Route exact path="/" component={Login} />
         <Route path="/home" component={Home} />
         <CalendarProvider>
