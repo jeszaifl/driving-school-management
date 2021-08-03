@@ -3,22 +3,41 @@ import React, {
   createContext,
   useEffect
 } from 'react';
+import ApiCalendar from 'react-google-calendar-api';
 import PropTypes from 'prop-types';
 import config from '../utility/api';
+import { IsEmpty } from '../utility/ToolFct';
 
 export const CalendarContext = createContext();
 
 const CalendarProvider = (props) => {
   const [calendarEvents, setCalendarEvents] = useState()
+  const [userInfo, setUserInfo] = useState({ userName: '', userImg: '' })
 
   const { children } = props
 
   useEffect(() => {
+    ApiCalendar.onLoad(() => {
+      getUserInfo()
+      ApiCalendar.listenSign(getUserInfo);
+    });
     getAllEvents()
   }, []);
 
+  const getUserInfo = () => {
+    const response = ApiCalendar.getBasicUserProfile()
+    if (!IsEmpty(response)) {
+      setUserInfo({
+        userName: response.getName(),
+        userImg: response.getImageUrl(),
+      })
+    }
+  }
+
   const getAllEvents = () => {
-    fetch(`${config.api}appointments`)
+    const userId = localStorage.getItem('userId')
+    fetch(`${config.api}users/appointments/${userId}`)
+      // fetch(`${config.api}appointments`)
       .then((response) => response.json())
       .then((result) => {
         const dataArray = []
@@ -39,6 +58,7 @@ const CalendarProvider = (props) => {
             endDate
           })
         })
+
         setCalendarEvents(dataArray)
       })
       .catch((error) => console.log('error', error));
@@ -47,6 +67,8 @@ const CalendarProvider = (props) => {
   const payload = {
     calendarEvents,
     getAllEvents,
+    getUserInfo,
+    userInfo
   };
 
   return <CalendarContext.Provider value={payload}>{children}</CalendarContext.Provider>;

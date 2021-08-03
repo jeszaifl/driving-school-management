@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react'
+import React, { useContext, useState, Fragment } from 'react'
 import PropTypes from 'prop-types';
 import ApiCalendar from 'react-google-calendar-api';
 import { withRouter } from 'react-router-dom';
@@ -7,16 +7,58 @@ import config from '../utility/api';
 import UserDM from '../utility/dataModel/UserDm';
 import { IsEmpty, validateFields } from '../utility/ToolFct';
 import { AuthContext } from '../context/AuthContext';
+import { CalendarContext } from '../context/CalendarContext';
 
 function Login(props) {
   const [fields, setFields] = useState();
+  const [registerFields, setRegisterFields] = useState();
+  const [formVisible, setFormVisible] = useState(true);
+
   const { history } = props
-  const { isLoggedIn, setIsLoggedIn } = useContext(AuthContext)
+  const { setIsLoggedIn, setUserInfo } = useContext(AuthContext)
+  const { getAllEvents } = useContext(CalendarContext)
 
   const handleChange = (e) => {
     const { name, value } = e.target
     setFields({
       ...fields,
+      [name]: value
+    })
+  }
+
+  const registerUser = () => {
+    const myHeaders = new Headers();
+    myHeaders.append('Content-Type', 'application/json');
+
+    const raw = JSON.stringify(registerFields);
+    const requestOptions = {
+      method: 'POST',
+      headers: myHeaders,
+      body: raw,
+      redirect: 'follow'
+    };
+
+    fetch(`${config.api}users/register`, requestOptions)
+      .then((response) => response.text())
+      .then((result) => {
+        const res = JSON.parse(result)
+        console.log(result)
+        if (!IsEmpty(res.error)) {
+          alert(res.error)
+        } else {
+          // setFields([])
+          // fetchUsers()
+          window.location.reload()
+        }
+      })
+      .catch((error) => {
+        console.log(error)
+      });
+  }
+  const handleregisterChange = (e) => {
+    const { name, value } = e.target
+    setRegisterFields({
+      ...registerFields,
       [name]: value
     })
   }
@@ -50,8 +92,10 @@ function Login(props) {
         userData.readFromObj(JSON.parse(result))
 
         if (!IsEmpty(userData._id)) {
-          history.push('/calendar');
+          localStorage.setItem('userId', userData._id)
           setIsLoggedIn(true)
+          getAllEvents()
+          history.push('/calendar');
         } else {
           alert('Something went wrong')
         }
@@ -73,70 +117,172 @@ function Login(props) {
       }
     }
   }
-
   return (
-    <div className="container">
-      <form className="loginForm">
-        <div className="form">
-          <div className="row">
-            <div className="twelve column">
-              <h4>Login</h4>
-            </div>
-            <div className="row">
-              <div className="twelve columns">
-                <label htmlFor="exampleEmailInput"> </label>
-                <input
-                  className="u-full-width"
-                  placeholder="Username / email"
-                  type="email"
-                  name="email"
-                  onChange={(e) => handleChange(e)}
-                  required
-                />
-              </div>
-              <div className="twelve columns">
-                <label htmlFor="exampleEmailInput"> </label>
-                <input
-                  className="u-full-width"
-                  placeholder="Password"
-                  type="password"
-                  name="password"
-                  onChange={(e) => handleChange(e)}
-                  required
-                />
-              </div>
-            </div>
-          </div>
-          <div className="row">
-            <div className="six columns">
-              <input type="checkbox" />
-              <span className="label-body">Remember Me</span>
-            </div>
-          </div>
-          <button
-            className="button-primary loginBtn"
-            type="button"
-            onClick={(e) => { loginUser(e) }}
-          >
-            Login
-          </button>
+    <Fragment>
+      <div className="container">
+        <div className="twelve columns">
+          {
+            formVisible
+              ? (
+                <form className="loginForm">
+                  <div className="form">
+                    <div className="row">
+                      <div className="twelve column">
+                        <h4>Login</h4>
+                      </div>
+                      <div className="row">
+                        <div className="twelve columns">
+                          <label htmlFor="exampleEmailInput"> </label>
+                          <input
+                            className="u-full-width"
+                            placeholder="Username / email"
+                            type="email"
+                            name="email"
+                            onChange={(e) => handleChange(e)}
+                            required
+                          />
+                        </div>
+                        <div className="twelve columns">
+                          <label htmlFor="exampleEmailInput"> </label>
+                          <input
+                            className="u-full-width"
+                            placeholder="Password"
+                            type="password"
+                            name="password"
+                            onChange={(e) => handleChange(e)}
+                            required
+                          />
+                        </div>
+                        <div className="twelve columns">
+                          <button
+                            className="button-primary loginBtn"
+                            type="button"
+                            onClick={(e) => { loginUser(e) }}
+                          >
+                            Login
+                          </button>
+                        </div>
+                        <div className="twelve columns">
+                          <button
+                            className="button-danger loginBtn"
+                            type="button"
+                            onClick={(e) => { setFormVisible(false) }}
+                          >
+                            Create Account
+                          </button>
+                        </div>
+                      </div>
+                    </div>
 
-          {/* <input
-          id="deleteButton"
-          className="button-primary loginBtn"
-          type="button"
-          value="Login google"
-          onClick={(e) => handleItemClick(e, 'sign-in')}
-        /> */}
-          {/* <Link
-          className="button-primary loginBtn"
-          to="/calendar"
-        >
-          Login as anonymous
-        </Link> */}
+                  </div>
+                </form>
+              )
+              : (
+                <form className="registerForm">
+                  <div className="form">
+                    <div className="row">
+                      <div className="twelve column">
+                        <h4>Register</h4>
+                      </div>
+                      <div className="row">
+                        <div className="six columns">
+                          <label htmlFor="exampleEmailInput"> </label>
+                          <input
+                            className="u-full-width"
+                            placeholder="First Name"
+                            type="text"
+                            name="firstName"
+                            onChange={(e) => handleregisterChange(e)}
+                            required
+                          />
+                        </div>
+                        <div className="six columns">
+                          <label htmlFor="exampleEmailInput"> </label>
+                          <input
+                            className="u-full-width"
+                            placeholder="Last Name"
+                            type="text"
+                            name="lastName"
+                            onChange={(e) => handleregisterChange(e)}
+                            required
+                          />
+                        </div>
+                      </div>
+                      <div className="row">
+                        <div className="twelve columns">
+                          <label htmlFor="exampleEmailInput"> </label>
+                          <input
+                            className="u-full-width"
+                            placeholder="Email"
+                            type="email"
+                            name="email"
+                            onChange={(e) => handleregisterChange(e)}
+                            required
+                          />
+                        </div>
+                        <div className="twelve columns">
+                          <select
+                            className="u-full-width"
+                            name="type"
+                            onChange={(e) => handleregisterChange(e)}
+                          >
+                            <option selected="true" disabled="disabled">---</option>
+                            <option value="admin">Admin</option>
+                            <option value="student">Student</option>
+                            <option value="driver">Driver</option>
+                          </select>
+                        </div>
+                        <div className="twelve columns">
+                          <label htmlFor="exampleEmailInput"> </label>
+                          <input
+                            className="u-full-width"
+                            placeholder="Password"
+                            type="password"
+                            name="password"
+                            onChange={(e) => handleregisterChange(e)}
+                            required
+                          />
+                        </div>
+                        <div className="twelve columns">
+                          <label htmlFor="exampleEmailInput"> </label>
+                          <input
+                            className="u-full-width"
+                            placeholder="Confirm Password"
+                            type="password"
+                            name="password"
+                            onChange={(e) => handleregisterChange(e)}
+                            required
+                          />
+                        </div>
+                        <div className="twelve columns">
+                          <button
+                            className="button-primary registerBtn"
+                            type="button"
+                            value="Register"
+                            onClick={(e) => { registerUser(e) }}
+                          >
+                            Register
+                          </button>
+                        </div>
+                        <div className="twelve columns">
+                          <button
+                            className="button-danger registerBtn"
+                            type="button"
+                            value="Register"
+                            onClick={(e) => { setFormVisible(true) }}
+                          >
+                            Already have an account
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </form>
+              )
+          }
         </div>
-      </form>
-    </div>
+      </div>
+    </Fragment>
   )
 }
 

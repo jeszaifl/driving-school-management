@@ -22,6 +22,7 @@ import {
 
 import { CalendarContext } from '../../context/CalendarContext';
 import Notification from '../Notification/Notification';
+import { AuthContext } from '../../context/AuthContext';
 
 function AppointmentForm(props, ref) {
   const [fields, setFields] = useState();
@@ -75,25 +76,9 @@ function AppointmentForm(props, ref) {
   const submitForm = () => {
     const {
       _id,
-      title,
-      date,
-      startTime,
-      puTime,
-      endTime,
-      doTime,
-      driver,
-      type,
-      puLocation,
-      instructor,
-      vehicle,
-      status,
-      instrunctionOne,
-      instructionTwo,
-      notes,
     } = fields
 
     const div = appointmentFormREF.current
-    console.log(div)
     if (!validateFields(div)) {
       return false
     }
@@ -108,6 +93,10 @@ function AppointmentForm(props, ref) {
 
     const appointMentModel = new AppointmentDM()
     appointMentModel.readFromObj(fields)
+
+    const dataFromStorage = localStorage.getItem('userId')
+    appointMentModel.userId = dataFromStorage
+
     removeKeyFromObject(appointMentModel, ['_id', 'createdAt'])
 
     const startDateTime = new Date(`${appointMentModel.date} ${appointMentModel.startTime}`).toISOString();
@@ -142,7 +131,7 @@ function AppointmentForm(props, ref) {
         .then((googleRes) => {
           notification.current.success('Update Data to Google calendar')
           const raw = JSON.stringify({
-            ...appointMentModel
+            ...appointMentModel,
           });
           upsertForm(url, raw, method)
         }).catch((error) => {
@@ -176,10 +165,24 @@ function AppointmentForm(props, ref) {
 
   const handleChange = (e) => {
     const { name, value } = e.target
-    setFields({
-      ...fields,
-      [name]: value
-    })
+
+    if (name === 'endTime') {
+      const startTime = parseInt(fields.startTime.replace(/:/g, ''), 10)
+      const endTime = parseInt(value.replace(/:/g, ''), 10)
+      if (startTime > endTime) {
+        alert('Please select another time.')
+      } else {
+        setFields({
+          ...fields,
+          [name]: value
+        })
+      }
+    } else {
+      setFields({
+        ...fields,
+        [name]: value
+      })
+    }
   }
 
   return (
@@ -415,7 +418,7 @@ function AppointmentForm(props, ref) {
       <div className="row">
         <div className="twelve columns">
           <label>
-            Insruction 2
+            Instruction 2
             {' '}
             <span style={{ color: 'red' }}>*</span>
           </label>

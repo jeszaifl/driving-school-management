@@ -1,13 +1,10 @@
 import React, {
   useState,
   useEffect,
-  useRef,
-  Fragment
 } from 'react'
 
 import Layout from '../components/Layout/Layout'
 import Modal from '../components/Modal/Modal'
-import Panel from '../components/Panel/Panel'
 import config from '../utility/api'
 import { IsEmpty } from '../utility/ToolFct'
 
@@ -44,10 +41,18 @@ export default function Users() {
     fetch(`${config.api}users/register`, requestOptions)
       .then((response) => response.text())
       .then((result) => {
-        setFields([])
-        fetchUsers()
+        const res = JSON.parse(result)
+
+        if (!IsEmpty(res.error)) {
+          alert(res.error)
+        } else {
+          setFields([])
+          fetchUsers()
+        }
       })
-      .catch((error) => console.log('error', error));
+      .catch((error) => {
+        console.log(error)
+      });
   }
 
   const handleChange = (e) => {
@@ -85,12 +90,15 @@ export default function Users() {
                 </div>
                 <div className="col-lg-6">
                   <label>Type</label>
-                  <input
+                  <select
                     className="u-full-width"
-                    type="text"
                     name="type"
                     onChange={(e) => handleChange(e)}
-                  />
+                  >
+                    <option value="admin">Admin</option>
+                    <option value="student">Student</option>
+                    <option value="driver">Driver</option>
+                  </select>
                 </div>
                 <div className="col-lg-12">
                   <label>Email</label>
@@ -123,27 +131,48 @@ export default function Users() {
       </div>
       <div className="container-fluid">
         <div className="row">
-          {
-            !IsEmpty(user)
-            && user.map((val, key) => {
-              return (
-                <div className="col-lg-3">
-                  <div className="card p-0">
-                    <div className="stat-widget-three home-widget-three">
-                      <div className="stat-content" style={{ margin: 0 }}>
-                        <div className="stat-digit">
-                          {val.firstName}
-                          {' '}
-                          {val.lastName}
-                        </div>
-                        <div className="stat-text">{val.email}</div>
-                      </div>
-                    </div>
-                  </div>
+          <div className="col-md-6">
+            <div className="card">
+              <div className="card-title pr">
+                <h4>All Users</h4>
+              </div>
+              <div className="card-body">
+                <div className="table-responsive">
+                  <table className="table student-data-table m-t-20">
+                    <thead>
+                      <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Type</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {
+                        !IsEmpty(user)
+                        && user.map((val, key) => {
+                          return (
+                            <tr>
+                              <td>
+                                {val.firstName}
+                                {' '}
+                                {val.lastName}
+                              </td>
+                              <td>
+                                {val.email}
+                              </td>
+                              <td>
+                                {val.type}
+                              </td>
+                            </tr>
+                          )
+                        })
+                      }
+                    </tbody>
+                  </table>
                 </div>
-              )
-            })
-          }
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </Layout>

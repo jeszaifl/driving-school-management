@@ -1,7 +1,5 @@
 import React, {
-  useState,
   useEffect,
-  useRef,
   Fragment,
   useContext
 } from 'react'
@@ -15,7 +13,7 @@ import { IsArrayEmpty } from '../utility/ToolFct';
 
 export default function Calendar() {
   // Context
-  const { calendarEvents, getAllEvents } = useContext(CalendarContext)
+  const { calendarEvents } = useContext(CalendarContext)
 
   useEffect(() => {
     console.log(calendarEvents)
@@ -71,6 +69,7 @@ export default function Calendar() {
                   />
                 </div>
               </div>
+
             </div>
           </div>
         </div>

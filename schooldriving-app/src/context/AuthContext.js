@@ -10,13 +10,13 @@ export const AuthContext = createContext();
 
 const AuthProvider = (props) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
-
   const { children } = props
-  useEffect(() => { }, []);
+  useEffect(() => {
+  });
 
   const payload = {
     isLoggedIn,
-    setIsLoggedIn
+    setIsLoggedIn,
   };
 
   return <AuthContext.Provider value={payload}>{children}</AuthContext.Provider>;

@@ -55,12 +55,9 @@ function validateFields(form) {
   const textareas = form.getElementsByTagName('textarea');
 
   const checklist = [...inputs, ...selects, ...textareas];
-  console.log(checklist)
-
   let ret = true
   let el = [];
   let isValid = false;
-  const errMsg = 'Errorrrr'
 
   for (let i = 0; i < checklist.length; i += 1) {
     el = checklist[i]

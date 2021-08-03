@@ -38,12 +38,12 @@ function App() {
             }
           }
         </AuthContext.Consumer> */}
-        <Route exact path="/" component={Login} />
-        <Route path="/home" component={Home} />
         <CalendarProvider>
+          <Route exact path="/" component={Login} />
+          <Route path="/home" component={Home} />
           <Route path="/calendar" component={Calendar} />
+          <Route path="/user" component={Users} />
         </CalendarProvider>
-        <Route path="/user" component={Users} />
       </Router>
     </AuthContextProvider>
   );

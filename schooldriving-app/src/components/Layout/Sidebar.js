@@ -1,23 +1,29 @@
-import React, { useEffect, useState, Fragment } from 'react';
+import React, {
+  useEffect,
+  useState,
+  Fragment,
+  useContext
+} from 'react';
 import { Link } from 'react-router-dom';
 import ApiCalendar from 'react-google-calendar-api';
 import PropTypes from 'prop-types';
 
 import './sidebar.style.scss'
 import { IsEmpty } from '../../utility/ToolFct';
+import { CalendarContext } from '../../context/CalendarContext';
 
 export default function Sidebar(props) {
-  const [userInfo, setUserInfo] = useState({ userName: '', userImg: '' })
+  const { userInfo } = useContext(CalendarContext)
 
   useEffect(() => {
-    ApiCalendar.onLoad(() => {
-      const response = ApiCalendar.getBasicUserProfile()
-      setUserInfo({
-        userName: response.getName(),
-        userImg: response.getImageUrl(),
-      })
-    });
-  }, [])
+    // console.log(userInfo)
+  })
+
+  const logout = () => {
+    localStorage.clear()
+    ApiCalendar.handleSignoutClick()
+    window.location.href = '/'
+  }
 
   return (
     <Fragment>
@@ -44,10 +50,18 @@ export default function Sidebar(props) {
                 </Link>
               </li>
               <li>
-                <Link to="/" className="sidebar-sub-toggle">
+                <button
+                  type="button"
+                  className="sidebar-sub-toggle"
+                  style={{
+                    border: 0,
+                    color: '#fff'
+                  }}
+                  onClick={(e) => { logout() }}
+                >
                   <i className="ti-home" />
                   Logout
-                </Link>
+                </button>
               </li>
             </ul>
           </div>
@@ -247,16 +261,21 @@ export default function Sidebar(props) {
                 </div>
                 <div className="dropdown dib">
                   <div className="header-icon" data-toggle="dropdown">
-                    <span className="user-avatar">
-                      <img
-                        alt="profile"
-                        src={`${!IsEmpty(userInfo) && userInfo.userImg}`}
-                        style={{ width: 30, height: 30, borderRadius: 30 }}
-                      />
-                      {' '}
-                      {!IsEmpty(userInfo) && userInfo.userName}
-                      <i className="ti-angle-down f-s-10" />
-                    </span>
+                    {
+                      !IsEmpty(userInfo.userName)
+                      && (
+                        <span className="user-avatar">
+                          <img
+                            alt="profile"
+                            src={`${!IsEmpty(userInfo) && userInfo.userImg}`}
+                            style={{ width: 30, height: 30, borderRadius: 30 }}
+                          />
+                          {' '}
+                          {!IsEmpty(userInfo) && userInfo.userName}
+                          <i className="ti-angle-down f-s-10" />
+                        </span>
+                      )
+                    }
 
                   </div>
                 </div>

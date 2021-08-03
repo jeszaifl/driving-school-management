@@ -2,7 +2,8 @@ import React, {
   Fragment,
   useRef,
   useState,
-  useEffect
+  useEffect,
+  useContext
 } from 'react';
 import PropTypes from 'prop-types';
 
@@ -21,15 +22,20 @@ import {
   WeekView
   // ConfirmationDialog,
 } from '@devexpress/dx-react-scheduler-material-ui';
+import ApiCalendar from 'react-google-calendar-api';
+
 import AppointmentFormComponent from '../AppointmentForm/AppointmentForm'
 
 import './scheduler.styles.css'
 import { formatDateYYYYMMDD, IsObjEmpty } from '../../utility/ToolFct';
 import AppointmentDM from '../../utility/dataModel/AppointmentDM';
+import { CalendarContext } from '../../context/CalendarContext';
 
 export default function SchedulerTable(props) {
   const [hasDeleteBtn, setHasDeleteBtn] = useState(false);
   const [isAppointmentFormVisble, setIsAppointmentFormVisble] = useState(false);
+
+  const { getUserInfo } = useContext(CalendarContext)
 
   const { schedulerData } = props
   const form = useRef();
@@ -112,6 +118,17 @@ export default function SchedulerTable(props) {
     )
   };
 
+  const setVisibility = (e) => {
+    if (!ApiCalendar.sign) {
+      ApiCalendar.handleAuthClick()
+      getUserInfo()
+    }
+
+    if (ApiCalendar.sign) {
+      setIsAppointmentFormVisble(e)
+    }
+  }
+
   return (
     <div>
       <Paper>
@@ -135,7 +152,7 @@ export default function SchedulerTable(props) {
           />
           <AppointmentForm
             visible={isAppointmentFormVisble}
-            onVisibilityChange={(e) => { setIsAppointmentFormVisble(e) }}
+            onVisibilityChange={(e) => { setVisibility(e) }}
             basicLayoutComponent={AppointmentFormLayout}
             commandLayoutComponent={CommandButton}
           />
