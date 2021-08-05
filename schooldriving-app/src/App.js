@@ -18,6 +18,8 @@ import './assets/lib/style.css';
 import './assets/main.scss';
 import './assets/skeleton.css';
 
+import 'react-datepicker/src/stylesheets/datepicker.scss'
+
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Calendar from './pages/Calendar';

@@ -183,3 +183,89 @@ code {
 //   top: 0;
 //   width: auto;
 // }
+
+.react-datepicker__time-container
+  .react-datepicker__time
+  .react-datepicker__time-box
+  ul.react-datepicker__time-list
+  li.react-datepicker__time-list-item {
+  font-size: 13px !important;
+}
+
+.legendCenter {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.legend {
+  list-style: none;
+}
+.legend li {
+  float: left;
+  display: inline;
+  margin-left: 15px;
+  margin-bottom: 0;
+  font-size: 12px;
+}
+.legend span {
+  float: left;
+  width: 15px;
+  height: 15px;
+  margin: 2px;
+  margin-right: 5px;
+}
+// .legend {
+//   /* bring your own prefixes */
+//   transform: translate(-50%, -50%);
+// }
+/* your colors */
+.open {
+  background-color: #33b5e5;
+}
+.Progress {
+  background-color: #ffbb33;
+}
+.Cancelled {
+  background-color: #ff3547;
+}
+.Confirmed {
+  background-color: #00c851;
+}
+
+.popup {
+  padding: 0 30px;
+}
+
+// .popup p {
+//   font-size: 13px;
+// }
+
+.titleTime {
+  color: black;
+  margin: 0;
+  float: left;
+  padding-right: 10px;
+}
+
+.button-danger {
+  background-color: #d9534f;
+  border-color: #d43f3a;
+  color: #fff;
+}
+
+.color-white {
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+tr.no-bottom-border td {
+  border-bottom: none;
+}
+
+.text-ellipsis {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

@@ -20,8 +20,8 @@ const CalendarProvider = (props) => {
     ApiCalendar.onLoad(() => {
       getUserInfo()
       ApiCalendar.listenSign(getUserInfo);
+      getAllEvents()
     });
-    getAllEvents()
   }, []);
 
   const getUserInfo = () => {
@@ -34,12 +34,27 @@ const CalendarProvider = (props) => {
     }
   }
 
-  const getAllEvents = () => {
-    const userId = localStorage.getItem('userId')
-    fetch(`${config.api}users/appointments/${userId}`)
-      // fetch(`${config.api}appointments`)
+  const getAllEvents = (email) => {
+    const googleData = ApiCalendar.getBasicUserProfile()
+
+    const myHeaders = new Headers();
+    myHeaders.append('Content-Type', 'application/json');
+
+    const raw = JSON.stringify({
+      googleEmail: googleData.getEmail()
+    });
+
+    const requestOptions = {
+      method: 'POST',
+      headers: myHeaders,
+      body: raw,
+      redirect: 'follow'
+    };
+
+    fetch(`${config.api}appointments/gmail`, requestOptions)
       .then((response) => response.json())
       .then((result) => {
+        console.log(result)
         const dataArray = []
         result.map((val, key) => {
           const {

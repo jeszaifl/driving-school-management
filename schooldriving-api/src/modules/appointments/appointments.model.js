@@ -6,7 +6,15 @@ const APIError = require('../../helpers/APIError');
  * Appointments Schema
  */
 const AppointmentsSchema = new mongoose.Schema({
+  googleEmail: {
+    type: String,
+    required: true
+  },
   googleCalendarId: {
+    type: String,
+    required: true
+  },
+  userId: {
     type: String,
     required: true
   },
@@ -98,6 +106,22 @@ AppointmentsSchema.statics = {
    */
   async get(id) {
     const expenses = await this.findById(id).populate('owner').exec();
+    if (!expenses) {
+      throw new APIError('No such expenses exists!', httpStatus.NOT_FOUND);
+    }
+    return expenses;
+  },
+
+  async getAppointmentByGmail(googleEmail) {
+    const appointments = await this.find({ googleEmail }).populate('owner').exec();
+    if (!appointments) {
+      throw new APIError('No such appointments exists!', httpStatus.NOT_FOUND);
+    }
+    return appointments;
+  },
+
+  async getAppointmentsByUserId(userId) {
+    const expenses = await this.find({ userId }).populate('owner').exec();
     if (!expenses) {
       throw new APIError('No such expenses exists!', httpStatus.NOT_FOUND);
     }

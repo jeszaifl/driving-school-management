@@ -8,6 +8,15 @@ import React, {
 import PropTypes from 'prop-types';
 
 import Paper from '@material-ui/core/Paper';
+import {
+  QueryBuilder,
+  Person,
+  Create,
+  DriveEta,
+  LocationOn,
+  List,
+} from '@material-ui/icons';
+
 import { ViewState } from '@devexpress/dx-react-scheduler';
 import {
   Scheduler,
@@ -27,7 +36,7 @@ import ApiCalendar from 'react-google-calendar-api';
 import AppointmentFormComponent from '../AppointmentForm/AppointmentForm'
 
 import './scheduler.styles.css'
-import { formatDateYYYYMMDD, IsObjEmpty } from '../../utility/ToolFct';
+import { convertTimeTo12Hours, formatDateYYYYMMDD, IsObjEmpty } from '../../utility/ToolFct';
 import AppointmentDM from '../../utility/dataModel/AppointmentDM';
 import { CalendarContext } from '../../context/CalendarContext';
 
@@ -96,23 +105,68 @@ export default function SchedulerTable(props) {
     children, style, ...restProps
   }) => {
     const { data } = restProps
+    let color;
+    switch (data.apiData.status) {
+      case 'Open':
+        color = '#33b5e5';
+        break;
+      case 'In Progress':
+        color = '#ffbb33';
+        break;
+      case 'Cancelled':
+        color = '#ff3547';
+        break;
+      case 'Confirmed':
+        color = '#00c851';
+        break;
+      default:
+        color = 'pink'
+    }
 
     return (
       <Appointments.Appointment
         {...restProps}
         style={{
           ...style,
-          backgroundColor: '#FFC107',
-          borderRadius: '8px',
+          backgroundColor: color,
+          borderRadius: 0,
           fontSize: 14,
           padding: 10,
         }}
       >
-        <p style={{ color: '#fff' }}>
-          <b>{data.apiData.startTime}</b>
-          {' '}
-          {data.apiData.title}
-        </p>
+        <div style={{ color: '#fff' }}>
+          <p className="color-white">
+            <b>
+              <QueryBuilder style={{
+                float: 'left',
+                marginRight: 5,
+              }}
+              />
+
+              {convertTimeTo12Hours(data.apiData.startTime)}
+              {' '}
+              -
+              {' '}
+              {convertTimeTo12Hours(data.apiData.endTime)}
+            </b>
+          </p>
+          <p className="color-white">
+            <Create style={{
+              float: 'left',
+              marginRight: 5,
+            }}
+            />
+            {data.apiData.title}
+          </p>
+          <p className="color-white">
+            <Person style={{
+              float: 'left',
+              marginRight: 5,
+            }}
+            />
+            {data.apiData.driver}
+          </p>
+        </div>
         {/* {children} */}
       </Appointments.Appointment>
     )
@@ -127,6 +181,108 @@ export default function SchedulerTable(props) {
     if (ApiCalendar.sign) {
       setIsAppointmentFormVisble(e)
     }
+  }
+  const customTooltip = (e) => {
+    let classColor = 'red'
+    switch (e.appointmentData.apiData.status) {
+      case 'Open':
+        classColor = 'open';
+        break;
+      case 'In Progress':
+        classColor = 'Progress';
+        break;
+      case 'Cancelled':
+        classColor = 'Cancelled';
+        break;
+      case 'Confirmed':
+        classColor = 'Confirmed';
+        break;
+      default:
+        classColor = 'pink'
+    }
+
+    return (
+      <div className="popup">
+        <p
+          className={classColor}
+          style={{
+            float: 'left',
+            margin: 7,
+            height: 20,
+            width: 20,
+            borderRadius: 100,
+          }}
+        />
+        <h3
+          className="text-ellipsis"
+          style={{
+            margin: 0,
+            fontSize: 20,
+            width: 300,
+          }}
+        >
+          {e.appointmentData.apiData.title}
+        </h3>
+        <p style={{ marginBottom: 10, borderBottom: '1px solid #EEEE', paddingBottom: 7 }}>
+          {new Date(e.appointmentData.apiData.date).toDateString()}
+          {' '}
+          -
+          {' '}
+          {convertTimeTo12Hours(e.appointmentData.apiData.startTime)}
+          {' '}
+          -
+          {' '}
+          {convertTimeTo12Hours(e.appointmentData.apiData.endTime)}
+        </p>
+        <div style={{ marginLeft: 5 }}>
+          <p style={{ marginBottom: 7 }}>
+            <Person style={{
+              fontSize: 22,
+              float: 'left',
+              marginRight: 7,
+            }}
+            />
+            {e.appointmentData.apiData.driver}
+          </p>
+          <p style={{ marginBottom: 7 }}>
+            <Person style={{
+              fontSize: 22,
+              float: 'left',
+              marginRight: 7,
+            }}
+            />
+            {e.appointmentData.apiData.instructor}
+          </p>
+          <p style={{ marginBottom: 7 }}>
+            <DriveEta style={{
+              fontSize: 22,
+              float: 'left',
+              marginRight: 7,
+            }}
+            />
+            {e.appointmentData.apiData.vehicle}
+          </p>
+          <p style={{ marginBottom: 7 }}>
+            <LocationOn style={{
+              fontSize: 22,
+              float: 'left',
+              marginRight: 7,
+            }}
+            />
+            {e.appointmentData.apiData.puLocation}
+          </p>
+          <p style={{ marginBottom: 15 }}>
+            <List style={{
+              fontSize: 22,
+              float: 'left',
+              marginRight: 7,
+            }}
+            />
+            {e.appointmentData.apiData.type}
+          </p>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -144,11 +300,7 @@ export default function SchedulerTable(props) {
           />
           <Appointments appointmentComponent={Appointment} />
           <AppointmentTooltip
-            // headerComponent={Header}
-            // contentComponent={AppointmentForm}
-            // commandButtonComponent={CommandButton}
-            showOpenButton
-            showDeleteButton
+            contentComponent={customTooltip}
           />
           <AppointmentForm
             visible={isAppointmentFormVisble}

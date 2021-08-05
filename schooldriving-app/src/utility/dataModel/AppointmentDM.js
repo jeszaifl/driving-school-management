@@ -1,5 +1,6 @@
 export default class AppointmentDM {
   _id = ''
+  googleEmail = ''
   googleCalendarId = ''
   userId = ''
   title = ''
@@ -22,6 +23,7 @@ export default class AppointmentDM {
   readFromObj(obj) {
     this._id = obj._id
     this.userId = obj.userId
+    this.googleEmail = obj.googleEmail
     this.googleCalendarId = obj.googleCalendarId
     this.title = obj.title
     this.date = obj.date

@@ -10,11 +10,13 @@ import React, {
 
 import PropTypes from 'prop-types';
 import ApiCalendar from 'react-google-calendar-api';
+import DatePicker from 'react-datepicker'
 
 import config from '../../utility/api';
 import AppointmentDM from '../../utility/dataModel/AppointmentDM';
 import {
   addDays,
+  formatDateYYYYMMDD,
   IsEmpty,
   removeKeyFromObject,
   validateFields
@@ -23,6 +25,8 @@ import {
 import { CalendarContext } from '../../context/CalendarContext';
 import Notification from '../Notification/Notification';
 import { AuthContext } from '../../context/AuthContext';
+
+const formatedDate = formatDateYYYYMMDD(new Date())
 
 function AppointmentForm(props, ref) {
   const [fields, setFields] = useState();
@@ -47,6 +51,13 @@ function AppointmentForm(props, ref) {
       }
     }
   }))
+
+  const filterPassedTime = (time) => {
+    const currentDate = new Date(`${formatedDate} ${fields.startTime}`);
+    const endDate = new Date(time);
+
+    return currentDate.getTime() < endDate.getTime();
+  };
 
   const deleteForm = () => {
     const { _id, googleCalendarId } = fields
@@ -90,12 +101,13 @@ function AppointmentForm(props, ref) {
       method = 'PUT'
       url = `${config.api}appointments/${_id}`
     }
-
+    const googleData = ApiCalendar.getBasicUserProfile()
     const appointMentModel = new AppointmentDM()
+
     appointMentModel.readFromObj(fields)
 
-    const dataFromStorage = localStorage.getItem('userId')
-    appointMentModel.userId = dataFromStorage
+    appointMentModel.googleEmail = googleData.getEmail()
+    appointMentModel.userId = googleData.getEmail()
 
     removeKeyFromObject(appointMentModel, ['_id', 'createdAt'])
 
@@ -124,7 +136,6 @@ function AppointmentForm(props, ref) {
         })
         .catch((error) => {
           notification.current.error(error.result.error.message)
-          console.log(error);
         });
     } else {
       ApiCalendar.updateEvent(eventToGoogle, appointMentModel.googleCalendarId)
@@ -161,6 +172,25 @@ function AppointmentForm(props, ref) {
         isVisbleFunction()
       })
       .catch((error) => console.log('error', error));
+  }
+
+  const timerPickerChange = (e, key) => {
+    let getPickerHours = new Date(e).getHours()
+    let getPickerMinutes = new Date(e).getMinutes()
+
+    if (getPickerHours < 10) {
+      getPickerHours = `0${getPickerHours}`
+    }
+
+    if (getPickerMinutes < 10) {
+      getPickerMinutes = `0${getPickerMinutes}`
+    }
+
+    const HHMM = `${getPickerHours}:${getPickerMinutes}`
+    setFields({
+      ...fields,
+      [key]: HHMM
+    })
   }
 
   const handleChange = (e) => {
@@ -238,13 +268,16 @@ function AppointmentForm(props, ref) {
             {' '}
             <span style={{ color: 'red' }}>*</span>
           </label>
-          <input
+          <DatePicker
             className="u-full-width"
-            type="time"
-            name="startTime"
-            defaultValue={formData.startTime}
-            onChange={(e) => handleChange(e)}
-            required
+            selected={!IsEmpty(fields) && (!IsEmpty(fields.startTime) && new Date(`${formatedDate} ${fields.startTime}`))}
+            placeholderText="---"
+            showTimeSelect
+            showTimeSelectOnly
+            onChange={(e) => timerPickerChange(e, 'startTime')}
+            timeIntervals={15}
+            timeCaption="Time"
+            dateFormat="h:mm  aa"
           />
         </div>
         <div className="six columns">
@@ -253,14 +286,16 @@ function AppointmentForm(props, ref) {
             {' '}
             <span style={{ color: 'red' }}>*</span>
           </label>
-          <input
+          <DatePicker
             className="u-full-width"
-            type="time"
-            name="puTime"
-            id="teest"
-            defaultValue={formData.puTime}
-            onChange={(e) => handleChange(e)}
-            required
+            selected={!IsEmpty(fields) && (!IsEmpty(fields.puTime) && new Date(`${formatedDate} ${fields.puTime}`))}
+            placeholderText="---"
+            showTimeSelect
+            showTimeSelectOnly
+            onChange={(e) => timerPickerChange(e, 'puTime')}
+            timeIntervals={15}
+            timeCaption="Time"
+            dateFormat="h:mm  aa"
           />
         </div>
       </div>
@@ -272,13 +307,17 @@ function AppointmentForm(props, ref) {
             {' '}
             <span style={{ color: 'red' }}>*</span>
           </label>
-          <input
+          <DatePicker
             className="u-full-width"
-            type="time"
-            name="endTime"
-            defaultValue={formData.endTime}
-            onChange={(e) => handleChange(e)}
-            required
+            selected={!IsEmpty(fields) && (!IsEmpty(fields.endTime) && new Date(`${formatedDate} ${fields.endTime}`))}
+            placeholderText="---"
+            showTimeSelect
+            showTimeSelectOnly
+            onChange={(e) => timerPickerChange(e, 'endTime')}
+            filterTime={filterPassedTime}
+            timeIntervals={15}
+            timeCaption="Time"
+            dateFormat="h:mm  aa"
           />
         </div>
         <div className="six columns">
@@ -287,13 +326,16 @@ function AppointmentForm(props, ref) {
             {' '}
             <span style={{ color: 'red' }}>*</span>
           </label>
-          <input
+          <DatePicker
             className="u-full-width"
-            type="time"
-            name="doTime"
-            defaultValue={formData.doTime}
-            onChange={(e) => handleChange(e)}
-            required
+            selected={!IsEmpty(fields) && (!IsEmpty(fields.doTime) && new Date(`${formatedDate} ${fields.doTime}`))}
+            placeholderText="---"
+            showTimeSelect
+            showTimeSelectOnly
+            onChange={(e) => timerPickerChange(e, 'doTime')}
+            timeIntervals={15}
+            timeCaption="Time"
+            dateFormat="h:mm  aa"
           />
         </div>
       </div>
@@ -386,14 +428,19 @@ function AppointmentForm(props, ref) {
             {' '}
             <span style={{ color: 'red' }}>*</span>
           </label>
-          <input
+
+          <select
             className="u-full-width"
-            type="text"
             name="status"
             defaultValue={formData.status}
             onChange={(e) => handleChange(e)}
-            required
-          />
+          >
+            <option disabled selected value="">---</option>
+            <option value="Open">Open</option>
+            <option value="In Progress">In Progress</option>
+            <option value="Cancelled">Cancelled</option>
+            <option value="Confirmed">Confirmed</option>
+          </select>
         </div>
       </div>
 

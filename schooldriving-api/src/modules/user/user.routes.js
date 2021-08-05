@@ -48,7 +48,11 @@ router.route('/profile')
 
 router.route('/register')
   /** POST /api/retister - Register user */
-  .post(validate(paramValidation.registerUser), userCtrl.register)
+  .post(validate(paramValidation.registerUser), userCtrl.register);
+
+router.route('/appointments/:userId')
+  /** POST /api/retister - Register user */
+  .get(userCtrl.getAppointmentsByUserId);
 
 router.route('/:userId')
   /** GET /api/users/:userId - Get user */

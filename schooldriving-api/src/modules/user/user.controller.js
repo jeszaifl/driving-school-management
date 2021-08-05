@@ -1,5 +1,6 @@
 const httpStatus = require('http-status');
 const User = require('./user.model');
+const Appointments = require('../appointments/appointments.model');
 const APIError = require('../../helpers/APIError');
 // const jwt = require('jsonwebtoken');
 const config = require('../../config');
@@ -15,6 +16,16 @@ async function load(req, res, next, id) {
   } catch (error) {
     return next(error);
   }
+}
+
+function getAppointmentsByUserId(req, res, next) {
+  Appointments.getAppointmentsByUserId(req.params.userId)
+    .then((foundAppointments) => {
+      return res.json(foundAppointments)
+    })
+    .catch((error) => {
+      return next(error);
+    })
 }
 
 function login(req, res, next) {
@@ -60,9 +71,9 @@ function register(req, res, next) {
     .exec()
     .then((foundUser) => {
       if (foundUser) {
-        return Promise.reject(
-          new APIError('Email must be unique', httpStatus.CONFLICT)
-        );
+        return res.json({
+          error: 'Email must be unique'
+        })
       }
       user.password = user.generatePassword(req.body.password);
       return user.save();
@@ -133,4 +144,5 @@ module.exports = {
   update,
   list,
   remove,
+  getAppointmentsByUserId,
 };

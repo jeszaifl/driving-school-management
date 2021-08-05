@@ -1,4 +1,9 @@
-import React, { useContext, useState, Fragment } from 'react'
+import React, {
+  useContext,
+  useState,
+  Fragment,
+  useEffect
+} from 'react'
 import PropTypes from 'prop-types';
 import ApiCalendar from 'react-google-calendar-api';
 import { withRouter } from 'react-router-dom';
@@ -13,10 +18,26 @@ function Login(props) {
   const [fields, setFields] = useState();
   const [registerFields, setRegisterFields] = useState();
   const [formVisible, setFormVisible] = useState(true);
+  const [moveToCalendar, setMoveToCalendar] = useState(false);
 
   const { history } = props
   const { setIsLoggedIn, setUserInfo } = useContext(AuthContext)
   const { getAllEvents } = useContext(CalendarContext)
+
+  useEffect(() => {
+    ApiCalendar.onLoad(() => {
+      ApiCalendar.listenSign(loginGoogleEvent);
+      loginGoogleEvent()
+    });
+  })
+
+  const loginGoogleEvent = () => {
+    const response = ApiCalendar.getBasicUserProfile()
+    if (!IsEmpty(response)) {
+      getAllEvents()
+      history.push('/calendar');
+    }
+  }
 
   const handleChange = (e) => {
     const { name, value } = e.target
@@ -94,7 +115,7 @@ function Login(props) {
         if (!IsEmpty(userData._id)) {
           localStorage.setItem('userId', userData._id)
           setIsLoggedIn(true)
-          getAllEvents()
+          // getAllEvents()
           history.push('/calendar');
         } else {
           alert('Something went wrong')
@@ -105,18 +126,6 @@ function Login(props) {
     return true
   }
 
-  const handleItemClick = (e, name) => {
-    if (ApiCalendar.sign) {
-      history.push('/calendar');
-    } else {
-      if (name === 'sign-in') {
-        ApiCalendar.handleAuthClick();
-        // history.push('/calendar');
-      } else if (name === 'sign-out') {
-        ApiCalendar.handleSignoutClick();
-      }
-    }
-  }
   return (
     <Fragment>
       <div className="container">
@@ -130,8 +139,23 @@ function Login(props) {
                       <div className="twelve column">
                         <h4>Login</h4>
                       </div>
+
+                      <div className="twelve column">
+                        <button
+                          className="button-danger loginBtn"
+                          type="button"
+                          onClick={(e) => {
+                            ApiCalendar.handleAuthClick();
+                            setMoveToCalendar(true)
+                            loginGoogleEvent()
+                          }}
+                        >
+                          {moveToCalendar ? '' : 'Sign in to Google'}
+                        </button>
+                      </div>
+
                       <div className="row">
-                        <div className="twelve columns">
+                        {/* <div className="twelve columns">
                           <label htmlFor="exampleEmailInput"> </label>
                           <input
                             className="u-full-width"
@@ -140,6 +164,7 @@ function Login(props) {
                             name="email"
                             onChange={(e) => handleChange(e)}
                             required
+                            disabled
                           />
                         </div>
                         <div className="twelve columns">
@@ -151,12 +176,14 @@ function Login(props) {
                             name="password"
                             onChange={(e) => handleChange(e)}
                             required
+                            disabled
                           />
                         </div>
                         <div className="twelve columns">
                           <button
                             className="button-primary loginBtn"
                             type="button"
+                            disabled
                             onClick={(e) => { loginUser(e) }}
                           >
                             Login
@@ -164,16 +191,17 @@ function Login(props) {
                         </div>
                         <div className="twelve columns">
                           <button
-                            className="button-danger loginBtn"
+                            className="button loginBtn"
                             type="button"
+                            disabled
                             onClick={(e) => { setFormVisible(false) }}
                           >
                             Create Account
                           </button>
-                        </div>
+                        </div> */}
                       </div>
-                    </div>
 
+                    </div>
                   </div>
                 </form>
               )

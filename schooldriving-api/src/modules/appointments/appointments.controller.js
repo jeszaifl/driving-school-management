@@ -23,6 +23,16 @@ function get(req, res) {
   return res.json(req.appointments);
 }
 
+async function getByGmail(req, res, next) {
+  const { body } = req;
+  try {
+    const googleAppointments = await Appointments.getAppointmentByGmail(body.googleEmail);
+    return res.json(googleAppointments);
+  } catch (error) {
+    return next(error);
+  }
+}
+
 /**
  * Create new appointments
  * @property {string} req.body.title - The name of appointments.
@@ -49,7 +59,9 @@ async function create(req, res, next) {
  */
 async function update(req, res, next) {
   const { appointments } = req;
+  appointments.googleEmail = req.body.googleEmail || appointments.googleEmail;
   appointments.googleCalendarId = req.body.googleCalendarId || appointments.googleCalendarId;
+  appointments.userId = req.body.userId || appointments.userId;
   appointments.title = req.body.title || appointments.title;
   appointments.date = req.body.date || appointments.date;
   appointments.startTime = req.body.startTime || appointments.startTime;
@@ -108,4 +120,5 @@ module.exports = {
   update,
   list,
   remove,
+  getByGmail,
 };

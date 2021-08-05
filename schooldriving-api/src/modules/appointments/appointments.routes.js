@@ -8,6 +8,8 @@ const router = express.Router();
 const paramValidation = {
   createAppointments: {
     body: Joi.object({
+      userId: Joi.string().required(),
+      googleEmail: Joi.string().required(),
       googleCalendarId: Joi.string().required(),
       title: Joi.string().required(),
       date: Joi.string().required(),
@@ -32,6 +34,8 @@ const paramValidation = {
     }),
     body: Joi.object({
       googleCalendarId: Joi.string().required(),
+      googleEmail: Joi.string().required(),
+      userId: Joi.string().required(),
       title: Joi.string().required(),
       date: Joi.string().required(),
       startTime: Joi.string().required(),
@@ -49,6 +53,11 @@ const paramValidation = {
       notes: Joi.string().required(),
     }),
   },
+  getByGmail: {
+    body: Joi.object({
+      googleEmail: Joi.string().required(),
+    }),
+  },
 };
 
 router.route('/')
@@ -57,6 +66,10 @@ router.route('/')
 
   /** POST /api/appointments - Create new appointments */
   .post(validate(paramValidation.createAppointments), appointmentsCtrl.create);
+
+router.route('/gmail')
+  /** POST /api/appointments - Create new appointments */
+  .post(validate(paramValidation.getByGmail), appointmentsCtrl.getByGmail);
 
 router.route('/:appointmentsId')
   /** GET /api/appointments/:appointmentsId - Get appointments */

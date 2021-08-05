@@ -44,6 +44,18 @@ function addDays(date, days) {
   return result;
 }
 
+function convertTimeTo12Hours(time) {
+  // Check correct time format and split into components
+  time = time.toString().match(/^([01]\d|2[0-3])(:)([0-5]\d)(:[0-5]\d)?$/) || [time];
+
+  if (time.length > 1) { // If time format correct
+    time = time.slice(1); // Remove full string match value
+    time[5] = +time[0] < 12 ? ' AM' : ' PM'; // Set AM/PM
+    time[0] = +time[0] % 12 || 12; // Adjust hours
+  }
+  return time.join(''); // return adjusted time or original string
+}
+
 function isValidUrl(str) {
   const pattern = new RegExp('^(https?:\\/\\/)?((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|((\\d{1,3}\\.){3}\\d{1,3}))(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*(\\?[;&a-z\\d%_.~+=-]*)?(\\#[-a-z\\d_]*)?$', 'i')
   return !!pattern.test(str);
@@ -73,13 +85,6 @@ function validateFields(form) {
     } else {
       el.classList.remove('invalid-border')
     }
-
-    // if (!isValid) {
-    //   el.classList.add('invalid-border')
-    //   ret = false
-    // } else {
-    //   el.classList.remove('invalid-border')
-    // }
   }
 
   return ret
@@ -93,5 +98,6 @@ export {
   removeKeyFromObject,
   isValidUrl,
   addDays,
-  validateFields
+  validateFields,
+  convertTimeTo12Hours
 }
